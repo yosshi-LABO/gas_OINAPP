@@ -1,0 +1,158 @@
+<style>
+  /* 【全画面共通】画面全体の背景色、基本フォント、余白を設定 */
+  body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+    padding: 24px 16px; 
+    background: #f1f5f9; 
+    color: #334155;
+    margin: 0;
+  }
+    
+  /* 【全画面共通】画面中央に配置される白背景のメインカード枠 */
+  .container, .card { 
+    background: #ffffff; 
+    padding: 28px 36px; 
+    border-radius: 12px; 
+    max-width: 860px; 
+    margin: 0 auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
+    box-sizing: border-box;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* 【全画面共通】ヘッダーエリア */
+  .header-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  /* 【全画面共通】ページ最上部の大見出しタイトル */
+  h2 {
+    margin: 0;
+    font-size: 19px;
+    color: #0f172a;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* 【全画面共通】タイトルの左側に配置するアクセントバー */
+  h2::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 18px;
+    background: #2563eb;
+    border-radius: 3px;
+  }
+
+  /* 【全画面共通】入力項目上の見出しラベル */
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 4px;
+  }
+
+  /* 【全画面共通】テキスト入力・日付・セレクトボックス等の標準入力枠 */
+  .text-input {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 0px; /* グリッドのgapで制御するため0に */
+    box-sizing: border-box;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13.5px;
+    color: #1e293b;
+    background-color: #ffffff;
+    transition: all 0.15s ease-in-out;
+  }
+
+  /* 【全画面共通】入力枠にフォーカスが当たった時 */
+  .text-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  /* 【全画面共通】画面遷移用ボタン */
+  .btn-secondary {
+    display: inline-block;
+    padding: 6px 14px;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover {
+    background-color: #e2e8f0;
+    color: #0f172a;
+  }
+
+
+  /* ==========================================
+     【共通】処理履歴（タイムライン）スタイル
+     ========================================== */
+  /* 処理履歴（タイムライン） */
+  .detail-meta-area {
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    max-height: 420px;
+    overflow-y: auto; /* 履歴が多くなっても右側単体でスクロール */
+  }
+
+  .timeline-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #1e293b;
+    font-size: 12.5px;
+  }
+
+  .timeline-item {
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 11.5px;
+    color: #334155;
+  }
+
+  .timeline-action {
+    font-weight: 700;
+    color: #2563eb;
+  }
+
+  .timeline-time {
+    color: #64748b;
+    font-size: 10.5px;
+    margin-left: 4px;
+  }
+
+  .timeline-user {
+    margin-top: 2px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .timeline-comment {
+    margin-top: 3px;
+    font-weight: normal;
+    color: #475569;
+  }
+</style>

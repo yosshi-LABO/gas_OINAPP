@@ -1,0 +1,584 @@
+<?
+  // モードの判定 (未定義の場合は 'new')
+  var currentMode = (typeof mode !== 'undefined') ? mode : 'new';
+  var isApproval = (currentMode === 'approval');
+  var dis = isApproval ? 'disabled' : '';
+  var disStyle = isApproval ? 'background-color: #f1f5f9; cursor: not-allowed;' : '';
+?>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>押印申請 申請画面</title>
+  <style>
+    <?!= include('css_common'); ?>
+    <?!= include('css_form'); ?>
+  </style>
+</head>
+
+<body>
+  <!-- 1060pxのカード枠 -->
+  <div class="form-card-1060">
+
+    <!-- ヘッダーエリア -->
+    <div class="header-area">
+      <h2>押印申請 申請画面</h2>
+      
+      <a href="<?= ScriptApp.getService().getUrl() ?>?page=list" target="_top" class="btn-secondary">
+        ← 一覧画面へ
+      </a>
+    </div>
+
+    <!-- 左右分割の開始 -->
+    <div class="layout-2col">
+      <div class="layout-main-form">
+
+      <!-- フォームエリア -->
+      <div class="form-grid">
+
+      <!-- 申請日 -->
+      <div>
+        <label>申請日 <span style="color: #999; font-size: 11px;">*自動入力</span></label>
+        <input type="date" id="appDate" class="text-input" value="<?= formData.applicationDate ?>" readonly style="background-color: #e9ecef; cursor: not-allowed;">
+      </div>
+
+      <!-- 起案番号 -->
+      <div>
+        <label>起案番号 <span style="color: #999; font-size: 11px;">*自動採番</span></label>
+        <input type="text" id="refNum" class="text-input" value="<?= formData.referenceNumber ?>" readonly style="background-color: #e9ecef; cursor: not-allowed;">
+      </div>
+      
+
+      <h3>— 申請者情報 —</h3>
+
+      <!-- 所属会社 (必須) -->
+      <div>
+        <label>所属会社 <span style="color: red;">*</span></label>
+        <select id="company" class="text-input" onchange="validateField('company')" <?= dis ?> style="<?= disStyle ?>">
+          <option value=""> --選択してください-- </option>
+          <option value="MGT株式会社" <?= formData.companyName === 'MGT株式会社' ? 'selected' : '' ?>>MGT株式会社</option>
+          <option value="XHD株式会社" <?= formData.companyName === 'XHD株式会社' ? 'selected' : '' ?>>XHD株式会社</option>
+          <option value="XFS株式会社" <?= formData.companyName === 'XFS株式会社' ? 'selected' : '' ?>>XFS株式会社</option>
+          <option value="XCS株式会社" <?= formData.companyName === 'XCS株式会社' ? 'selected' : '' ?>>XCS株式会社</option>
+          <option value="XNT株式会社" <?= formData.companyName === 'XNT株式会社' ? 'selected' : '' ?>>XNT株式会社</option>
+          <option value="XYL株式会社" <?= formData.companyName === 'XYL株式会社' ? 'selected' : '' ?>>XYL株式会社</option>
+          <option value="その他の会社名" <?= formData.companyName === 'その他の会社名' ? 'selected' : '' ?>>その他の会社名(所属部署欄に記入下さい)</option>
+        </select>
+        <div id="companyError" class="error-msg"></div>
+      </div>
+
+      <!-- 所属部署 (必須) -->
+      <div>
+        <label>所属部署 <span style="color: red;">*</span></label>
+        <input type="text" id="deptName" class="text-input" value="<?= formData.deptName ?>" placeholder="例: 情報システム部" <?= dis ?> style="<?= disStyle ?>">
+        <div id="deptNameError" class="error-msg"></div>
+      </div>
+
+      <!-- 申請者ID (必須) -->
+      <div>
+        <label>申請者ID <span style="color: red;">*</span></label>
+        <input type="text" id="employeeId" class="text-input" value="<?= formData.employeeId ?>" placeholder="例: 012345" maxlength="6" <?= dis ?> style="<?= disStyle ?>">
+        <div id="employeeIdError" class="error-msg"></div>
+      </div>
+
+      <!-- 申請者名 (必須) -->
+      <div>
+        <label>申請者名 <span style="color: red;">*</span></label>
+        <input type="text" id="employeeName" class="text-input" value="<?= formData.employeeName ?>" <?= dis ?> style="<?= disStyle ?>">
+        <div id="employeeNameError" class="error-msg"></div>
+      </div>
+
+      <!-- 所属部署種別 (必須) -->
+      <div>
+        <label>所属部署種別 <span style="color: red;">*</span></label>
+        <div class="field-group-container" style="gap: 20px;">
+          <input type="radio" name="deptType" value="オフィス" <?= formData.departmentType === 'オフィス' ? 'checked' : '' ?> <?= dis ?>> オフィス
+          <input type="radio" name="deptType" value="店舗" <?= formData.departmentType === '店舗' ? 'checked' : '' ?> <?= dis ?>> 店舗
+        </div>
+      </div>
+
+      <h3>— 書類情報 —</h3>
+
+      <div class="notice-box">
+        <div class="notice-title">注意事項</div>
+        ・申請に不備がある場合、差し戻します。<br>
+        ・相手先が異なる場合、別途新規で申請してください。
+      </div>
+
+      <!-- 押印が必要な会社 -->
+      <div class="full-width">
+        <label>押印が必要な会社（複数選択可） <span style="color: red;">*</span></label>
+        <div class="field-group-container" style="flex-wrap: nowrap; gap: 24px; overflow-x: auto;">
+          <input type="checkbox" name="sealCompany" value="MGT" <?= formData.sealCompanies.indexOf('MGT') !== -1 ? 'checked' : '' ?> <?= dis ?>> MGT
+          <input type="checkbox" name="sealCompany" value="XHD" <?= formData.sealCompanies.indexOf('XHD') !== -1 ? 'checked' : '' ?> <?= dis ?>> XHD
+          <input type="checkbox" name="sealCompany" value="XFS" <?= formData.sealCompanies.indexOf('XFS') !== -1 ? 'checked' : '' ?> <?= dis ?>> XFS
+          <input type="checkbox" name="sealCompany" value="XCS" <?= formData.sealCompanies.indexOf('XCS') !== -1 ? 'checked' : '' ?> <?= dis ?>> XCS
+          <input type="checkbox" name="sealCompany" value="XNT" <?= formData.sealCompanies.indexOf('XNT') !== -1 ? 'checked' : '' ?> <?= dis ?>> XNT
+          <input type="checkbox" name="sealCompany" value="XYL" <?= formData.sealCompanies.indexOf('XYL') !== -1 ? 'checked' : '' ?> <?= dis ?>> XYL
+        </div>
+        <div id="sealCompanyError" class="error-msg"></div>
+      </div>
+
+      <!-- 相手先会社名 -->
+      <div>
+        <label>相手先会社名</label>
+        <input type="text" id="clientCompany" class="text-input" value="<?= formData.clientCompany ?>" placeholder="例: 株式会社トリヒキサキ" <?= dis ?> style="<?= disStyle ?>">
+      </div>
+
+      <!-- グリッドエリア -->
+      <div class="grid-4cols">
+        <!-- 1. 書類名 -->
+        <div>
+          <label>書類名 <span style="color: red;">*</span></label>
+          <input type="text" id="documentName" class="text-input" value="<?= formData.documentName ?>" placeholder="例: 業務委託契約書" <?= dis ?> style="<?= disStyle ?>">
+          <div id="documentNameError" class="error-msg"></div>
+        </div>
+
+        <!-- 2. 部数 -->
+        <div>
+          <label>部数</label>
+          <input type="number" id="copies" class="text-input" value="<?= formData.copies ?>" <?= dis ?> style="<?= disStyle ?>">
+        </div>
+
+        <!-- 3. 必要押印 -->
+        <div>
+          <label>必要押印</label>
+          <select id="sealType" class="text-input" <?= dis ?> style="<?= disStyle ?>">
+            <option value="社印(角印)" <?= formData.sealType === '社印(角印)' ? 'selected' : '' ?>>社印(角印)</option>
+            <option value="社印(丸印)" <?= formData.sealType === '社印(丸印)' ? 'selected' : '' ?>>社印(丸印)</option>
+          </select>
+        </div>
+
+        <!-- 4. 稟決番号 -->
+        <div>
+          <label>稟決番号</label>
+          <input type="text" id="approvalNum" class="text-input" value="<?= formData.approvalNum ?>" placeholder="例: RNG2608-9999" <?= dis ?> style="<?= disStyle ?>">
+        </div>
+      </div>
+
+      <!-- 備考 -->
+      <div class="full-width">
+        <label>備考</label>
+        <textarea id="remarks" class="text-input" rows="3" <?= dis ?> style="<?= disStyle ?>"><?= formData.remarks ?></textarea>
+      </div>
+
+      <!-- 承認者メールアドレス -->
+      <div class="form-group">
+        <label for="approverEmail">【承認依頼用】承認者メールアドレス <span style="color: red;">*</span></label>
+        <input type="email" id="approverEmail" class="text-input" value="<?= formData.approverEmail ?>" placeholder="例: approver@example.com" <?= dis ?> style="<?= disStyle ?>">
+        <div id="approverEmailError" class="error-msg"></div>
+      </div>
+
+
+      <!-- ▼ ボタン・操作エリア（モードによって動的切り替え） -->
+      <? if (isApproval) { ?>
+        <!-- 【承認モード時】承認・差戻し操作エリア -->
+        <div class="full-width" style="margin-top: 24px; padding: 20px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+          <? var isProcessed = (formData.status && formData.status !== '申請中'); ?>
+          <? if (isProcessed) { ?>
+            <div style="background: #fef2f2; color: #991b1b; padding: 12px; border-radius: 6px; border: 1px solid #fecaca; text-align: center; font-weight: bold; font-size: 14px;">
+              ⚠️ この申請はすでに「<?= formData.status ?>」処理が完了しています。
+            </div>
+          <? } else { ?>
+            <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">
+              コメント欄　<span style="color: #dc2626; font-weight: bold;">※差戻しの場合は必須</span>
+            </div>
+            <textarea id="approvalComment" class="text-input" rows="3" placeholder="コメントを入力してください" style="width: 100%; box-sizing: border-box; margin-bottom: 16px;"></textarea>
+            
+            <div id="approvalBtnGroup" style="display: flex; gap: 12px;">
+              <button type="button" id="btnApprove" onclick="submitApprovalAction('approve')" style="flex: 1; height: 44px; font-size: 15px; font-weight: bold; background-color: #2563eb; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; transition: opacity 0.2s;">
+                承認
+              </button>
+              <button type="button" id="btnReject" onclick="submitApprovalAction('reject')" style="flex: 1; height: 44px; font-size: 15px; font-weight: bold; background-color: #dc2626; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; transition: opacity 0.2s;">
+                差戻
+              </button>
+            </div>
+          <? } ?>
+          <div id="approvalResult" style="margin-top: 16px; text-align: center; font-weight: bold; font-size: 15px;"></div>
+        </div>
+      <? } else { ?>
+        <!-- 【通常・再申請モード時】送信ボタンエリア -->
+        <div class="full-width" style="margin-top: 28px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+          
+          <!-- メイン：Gmail送信ボタン -->
+          <button type="button" id="btnGmail" onclick="sendData('gmail')" class="btn-submit btn-gmail" style="width: 100%; height: 48px; font-size: 16px; font-weight: bold; background-color: #2563eb; color: #ffffff; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(37,99,235,0.2);">
+            <span class="btn-text">申請する（メール通知）</span>
+            <span class="spinner" style="display: none;"></span>
+          </button>
+
+          <!-- サブ：LINE送信ボタンエリア -->
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; color: #64748b; margin-top: 4px;">
+            <span>LINEで通知を受け取りたい方はこちら ➔</span>
+            <button type="button" id="btnLine" onclick="sendData('line')" class="btn-submit btn-line" style="padding: 6px 14px; font-size: 12px; font-weight: bold; background-color: #ffffff; color: #06c755; border: 1px solid #06c755; border-radius: 20px; cursor: pointer; transition: all 0.2s;">
+              <span class="btn-text">LINE通知</span>
+              <span class="spinner" style="display: none;"></span>
+            </button>
+          </div>
+
+        </div>
+      <? } ?>
+
+      <!-- 送信・処理完了モーダル (モダンデザイン版) -->
+      <div id="successModal" class="modal-overlay" style="display: none; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px);">
+        <div id="modalCard" style="background: #ffffff; border-radius: 12px; padding: 24px 28px; width: 320px; text-align: center; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0;">
+        
+          <!-- アイコン領域（JSで動的変更） -->
+          <div id="modalIcon" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 22px; font-weight: bold;">
+          ✓
+          </div>
+
+          <!-- タイトル & 短い案内文 -->
+          <h3 id="modalTitle" style="margin: 0 0 4px 0; font-size: 17px; font-weight: 700; color: #0f172a;">完了しました</h3>
+          <p id="modalSub" style="margin: 0 0 18px 0; font-size: 13px; color: #64748b;">一覧画面へ移動します...</p>
+
+          <!-- 控えめなOKボタン -->
+          <a id="modalOkBtn" href="<?= ScriptApp.getService().getUrl() ?>?page=list" target="_top" style="display: block; width: 100%; height: 38px; line-height: 38px; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; box-sizing: border-box; transition: all 0.2s;">
+          OK
+          </a>
+
+        </div>
+      </div>
+
+
+      </div> <!-- /form-grid -->
+      </div> <!-- /layout-main-form -->
+
+      <!-- 右エリア：処理履歴 -->
+      <div class="layout-side-history">
+        <div class="side-history-box">
+          <div class="side-history-title">【処理履歴】</div>
+          
+          <div id="historyListArea">
+            <!-- 履歴情報を動的出力 -->
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- /layout-2col -->
+  </div> <!-- /form-card-1060 -->
+
+  <script>
+    function validateField(fieldId) {
+      if (fieldId === 'company' && document.getElementById('company').value.trim() !== "") {
+        document.getElementById('companyError').style.display = 'none';
+      }
+      if (fieldId === 'deptName' && document.getElementById('deptName').value.trim() !== "") {
+        document.getElementById('deptNameError').style.display = 'none';
+      }
+      if (fieldId === 'employeeId') {
+        var val = document.getElementById('employeeId').value.trim();
+        if (/^\d{6}$/.test(val)) {
+          document.getElementById('employeeIdError').style.display = 'none';
+        }
+      }
+      if (fieldId === 'employeeName' && document.getElementById('employeeName').value.trim() !== "") {
+        document.getElementById('employeeNameError').style.display = 'none';
+      }
+      if (fieldId === 'documentName' && document.getElementById('documentName').value.trim() !== "") {
+        document.getElementById('documentNameError').style.display = 'none';
+      }
+      if (fieldId === 'sealCompany') {
+        var checked = document.querySelectorAll('input[name="sealCompany"]:checked');
+        if (checked.length > 0) {
+          document.getElementById('sealCompanyError').style.display = 'none';
+        }
+      }
+    }
+
+    // ★ モーダル表示制御共通関数
+    function showCompletionModal(type, titleText) {
+      var successModal = document.getElementById('successModal');
+      var modalIcon = document.getElementById('modalIcon');
+      var modalTitle = document.getElementById('modalTitle');
+      var modalOkBtn = document.getElementById('modalOkBtn');
+
+      if (type === 'reject') {
+        // 【差戻し時】ローズレッド基調
+        if (modalIcon) {
+          modalIcon.textContent = '↩';
+          modalIcon.style.backgroundColor = '#fef2f2';
+          modalIcon.style.color = '#dc2626';
+        }
+        if (modalTitle) modalTitle.textContent = titleText || '差戻し完了';
+        if (modalOkBtn) {
+          modalOkBtn.style.backgroundColor = '#fef2f2';
+          modalOkBtn.style.color = '#991b1b';
+          modalOkBtn.style.border = '1px solid #fecaca';
+        }
+      } else {
+        // 【申請・承認時】エメラルドグリーン基調
+        if (modalIcon) {
+          modalIcon.textContent = '✓';
+          modalIcon.style.backgroundColor = '#f0fdf4';
+          modalIcon.style.color = '#16a34a';
+        }
+        if (modalTitle) modalTitle.textContent = titleText || '送信完了';
+        if (modalOkBtn) {
+          modalOkBtn.style.backgroundColor = '#f0fdf4';
+          modalOkBtn.style.color = '#15803d';
+          modalOkBtn.style.border = '1px solid #bbf7d0';
+        }
+      }
+
+      if (successModal) successModal.style.display = 'flex';
+
+      // 1.5秒（1500ms）後に一覧画面へ自動遷移
+      setTimeout(function() {
+        window.top.location.href = "<?= ScriptApp.getService().getUrl() ?>?page=list";
+      }, 1500);
+    }
+
+    function sendData(notifyType) {
+      var isValid = true;
+      var firstErrorElement = null;
+
+      var company = document.getElementById('company').value.trim();
+      var companyErr = document.getElementById('companyError');
+      if (company === "") {
+        companyErr.textContent = "ここは必須項目です。";
+        companyErr.style.display = "block";
+        if (!firstErrorElement) firstErrorElement = document.getElementById('company');
+        isValid = false;
+      } else {
+        companyErr.style.display = "none";
+      }
+
+      var deptName = document.getElementById('deptName').value.trim();
+      var deptNameErr = document.getElementById('deptNameError');
+      if (deptName === "") {
+        deptNameErr.textContent = "ここは必須項目です。";
+        deptNameErr.style.display = "block";
+        if (!firstErrorElement) firstErrorElement = document.getElementById('deptName');
+        isValid = false;
+      } else {
+        deptNameErr.style.display = "none";
+      }
+
+      var employeeId = document.getElementById('employeeId').value.trim();
+      var empErr = document.getElementById('employeeIdError');
+      if (!/^\d{6}$/.test(employeeId)) {
+        empErr.textContent = "社員番号は半角6桁での記入(先頭0埋め)が必要です。";
+        empErr.style.display = "block";
+        if (!firstErrorElement) firstErrorElement = document.getElementById('employeeId');
+        isValid = false;
+      } else {
+        empErr.style.display = "none";
+      }
+
+      var employeeName = document.getElementById('employeeName').value.trim();
+      var nameErr = document.getElementById('employeeNameError');
+      if (employeeName === "") {
+        nameErr.textContent = "ここは必須項目です。";
+        nameErr.style.display = "block";
+        if (!firstErrorElement) firstErrorElement = document.getElementById('employeeName');
+        isValid = false;
+      } else {
+        nameErr.style.display = "none";
+      }
+
+      var checkedSeal = document.querySelectorAll('input[name="sealCompany"]:checked');
+      var sealErr = document.getElementById('sealCompanyError');
+      if (checkedSeal.length === 0) {
+        sealErr.textContent = "最低1つ選択してください。";
+        sealErr.style.display = "block";
+        isValid = false;
+      } else {
+        sealErr.style.display = "none";
+      }
+
+      var documentName = document.getElementById('documentName').value.trim();
+      var docErr = document.getElementById('documentNameError');
+      if (documentName === "") {
+        docErr.textContent = "ここは必須項目です。";
+        docErr.style.display = "block";
+        if (!firstErrorElement) firstErrorElement = document.getElementById('documentName');
+        isValid = false;
+      } else {
+        docErr.style.display = "none";
+      }
+
+      var approverEmail = document.getElementById('approverEmail').value.trim();
+      var approverEmailErr = document.getElementById('approverEmailError');
+      if (approverEmail === "") {
+        approverEmailErr.textContent = "ここは必須項目です。";
+        approverEmailErr.style.display = "block";
+        if (!firstErrorElement) firstErrorElement = document.getElementById('approverEmail');
+        isValid = false;
+      } else {
+        approverEmailErr.style.display = "none";
+      }
+
+      if (!isValid) {
+        if (firstErrorElement) firstErrorElement.focus();
+        return;
+      }
+
+      var btnLine = document.getElementById('btnLine');
+      var btnGmail = document.getElementById('btnGmail');
+      var targetBtn = (notifyType === 'line') ? btnLine : btnGmail;
+      
+      if (btnLine) btnLine.disabled = true;
+      if (btnGmail) btnGmail.disabled = true;
+      
+      var btnTextElem = targetBtn ? targetBtn.querySelector('.btn-text') : null;
+      var spinnerElem = targetBtn ? targetBtn.querySelector('.spinner') : null;
+      var originalText = btnTextElem ? btnTextElem.textContent : "";
+
+      if (btnTextElem) btnTextElem.textContent = "送信中...";
+      if (spinnerElem) spinnerElem.style.display = "inline-block";
+
+      var selectedSealCompanies = [];
+      checkedSeal.forEach(function(checkbox) {
+        selectedSealCompanies.push(checkbox.value);
+      });
+
+      var selectedDept = document.querySelector('input[name="deptType"]:checked').value;
+
+      var data = {
+        applicationDate: document.getElementById('appDate').value,
+        referenceNumber: document.getElementById('refNum').value,
+        companyName: company,
+        deptName: deptName,
+        employeeId: employeeId,
+        employeeName: employeeName,
+        departmentType: selectedDept,
+        sealCompanies: selectedSealCompanies.join(', '),
+        clientCompany: document.getElementById('clientCompany').value,
+        documentName: documentName,
+        copies: document.getElementById('copies').value,
+        sealType: document.getElementById('sealType').value,
+        approvalNum: document.getElementById('approvalNum').value,
+        remarks: document.getElementById('remarks').value,
+        approverEmail: document.getElementById('approverEmail').value,
+        notifyType: notifyType
+      };
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (spinnerElem) spinnerElem.style.display = "none";
+          if (btnTextElem) btnTextElem.textContent = originalText;
+
+          // モーダル共通処理の呼び出し
+          showCompletionModal('success', '送信完了');
+        })
+        .withFailureHandler(function(error) {
+          if (btnLine) btnLine.disabled = false;
+          if (btnGmail) btnGmail.disabled = false;
+          if (spinnerElem) spinnerElem.style.display = "none";
+          if (btnTextElem) btnTextElem.textContent = originalText;
+
+          alert("送信に失敗しました: " + error.message);
+        })
+        .submitData(data);
+    }
+
+    // 承認・差戻し実行処理
+    function submitApprovalAction(action) {
+      var commentElem = document.getElementById("approvalComment");
+      var comment = commentElem ? commentElem.value : "";
+      var isReject = (action === "reject");
+
+      if (isReject && !comment.trim()) {
+        alert("差戻しを行う場合は、コメント（理由）の入力が必須です。");
+        return;
+      }
+
+      var approveBtn = document.getElementById("btnApprove");
+      var rejectBtn = document.getElementById("btnReject");
+      if (approveBtn) approveBtn.disabled = true;
+      if (rejectBtn) rejectBtn.disabled = true;
+
+      var refNum = document.getElementById("refNum").value;
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res.success) {
+            var isRejectAction = (action === 'reject');
+            // ステータスに応じて共通モーダルを表示
+            showCompletionModal(isRejectAction ? 'reject' : 'success', res.newStatus + '完了');
+          } else {
+            document.getElementById("approvalResult").innerText = "エラー: " + res.message;
+            document.getElementById("approvalResult").style.color = "#dc2626";
+            if (approveBtn) approveBtn.disabled = false;
+            if (rejectBtn) rejectBtn.disabled = false;
+          }
+        })
+        .withFailureHandler(function(err) {
+          alert("エラーが発生しました: " + err.message);
+          if (approveBtn) approveBtn.disabled = false;
+          if (rejectBtn) rejectBtn.disabled = false;
+        })
+        .processApprovalAction(refNum, action, comment);
+    }
+
+    function resetFormModal() {
+      document.getElementById('successModal').style.display = 'none';
+
+      document.getElementById('clientCompany').value = '';
+      document.getElementById('documentName').value = '';
+      document.getElementById('copies').value = '1';
+      document.getElementById('approvalNum').value = '';
+      document.getElementById('remarks').value = '';
+
+      var checkboxes = document.querySelectorAll('input[name="sealCompany"]');
+      checkboxes.forEach(function(cb) { cb.checked = false; });
+
+      var btnLine = document.getElementById('btnLine');
+      var btnGmail = document.getElementById('btnGmail');
+      if (btnLine) btnLine.disabled = false;
+      if (btnGmail) btnGmail.disabled = false;
+
+      google.script.run
+        .withSuccessHandler(function(nextRefNum) {
+          document.getElementById('refNum').value = nextRefNum;
+        })
+        .getNextReferenceNumber();
+    }
+
+    // 処理履歴（タイムライン）描画
+    function renderHistory() {
+      var historyArea = document.getElementById('historyListArea');
+      if (!historyArea) return;
+
+      var rawHistory = <?!= JSON.stringify(formData.history || []) ?>;
+      var historyList = [];
+
+      try {
+        if (rawHistory) {
+          historyList = (typeof rawHistory === 'string') ? JSON.parse(rawHistory) : rawHistory;
+        }
+      } catch(e) {
+        historyList = [];
+      }
+
+      var timelineHtml = '';
+      if (Array.isArray(historyList) && historyList.length > 0) {
+        historyList.forEach(function(h) {
+          var commentStr = h.comment ? '<div class="timeline-comment">コメント: ' + h.comment + '</div>' : '';
+          var emailStr = h.email ? ' (' + h.email + ')' : '';
+
+          timelineHtml += '<div class="timeline-item">'
+                       + '<span class="timeline-action">[' + (h.action || '') + ']</span> '
+                       + '<span class="timeline-time">' + (h.time || '') + '</span>'
+                       + '<div class="timeline-user">' + (h.user || '') + emailStr + '</div>'
+                       + commentStr
+                       + '</div>';
+        });
+      } else {
+        timelineHtml += '<div style="font-size: 12px; color: #94a3b8;">処理履歴はありません</div>';
+      }
+
+      historyArea.innerHTML = timelineHtml;
+    }
+
+    // 読み込み完了イベントの発生前・発生後どちらでも確実に実行する
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', renderHistory);
+    } else {
+      renderHistory();
+    }
+    
+
+  </script>
+</body>
+</html>
