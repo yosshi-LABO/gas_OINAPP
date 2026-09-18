@@ -1,5 +1,10 @@
 <style>
-  /* 【入力画面専用】スタイリッシュなグループ区切り小見出し（上下余白・パディングを縮小） */
+  /* ==========================================
+   * 1. 見出し・フォーム全体の基本レイアウト
+   * ========================================== */
+
+  /* h3: フォーム内の各グループを区切る小見出し（申請者情報、書類情報など）
+   * 通常の見出しより上下の余白やパディングを縮小し、左側に青いアクセント線を入れてスタイリッシュにしています。 */
   h3 {
     grid-column: span 2;
     margin-top: 6px;
@@ -13,19 +18,22 @@
     border-radius: 0 4px 4px 0;
   }
 
-  /* 【入力画面専用】フォーム全体を並べるグリッド（縦ギャップを12px ➔ 5pxに縮小） */
+  /* .form-grid: フォームの入力項目を並べる大枠のグリッド
+   * 画面を均等な2カラム（1fr 1fr）に分け、項目同士の縦の隙間を5pxに縮小して密度を高めています。 */
   .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 5px 16px;
   }
 
-  /* 【入力画面専用】全幅要素 */
+  /* .full-width: 2カラムグリッドの中で、横幅いっぱい（2カラム分）に要素を広げるためのクラス
+   * 備考欄や注意事項など、広いスペースが必要な項目に使用します。 */
   .full-width {
     grid-column: span 2;
   }
 
-  /* 【入力画面専用】書類名・部数・押印・稟決番号の4分割レイアウト */
+  /* .grid-4cols: 書類名・部数・必要押印・稟決番号などを1行に4つ並べるための特殊グリッド
+   * 幅の比率（2fr, 70px, 110px, 150px）を細かく指定し、省スペース化を図っています。 */
   .grid-4cols {
     grid-column: span 2;
     display: grid;
@@ -33,7 +41,35 @@
     gap: 0 12px;
   }
 
-  /* 【入力画面専用】テキストエリア（最小高さを60px ➔ 36pxに圧縮） */
+
+  /* ==========================================
+   * 2. 各種入力パーツ・メッセージの装飾
+   * ========================================== */
+
+  /* label: 入力欄の上にある項目名（ラベル）
+   * 行間を詰めてフォントサイズを小さくし、コンパクト化しています。 */
+  label {
+    display: inline-block;
+    font-size: 11.5px;
+    margin-bottom: 1px;
+  }
+
+  /* 入力フォーム共通（テキスト、日付、数値、メール、セレクトボックス）
+   * 高さを28pxに統一し、パディングを調整して入力領域全体をコンパクトにまとめています。 */
+  .text-input,
+  input[type="text"],
+  input[type="date"],
+  input[type="number"],
+  input[type="email"],
+  select.text-input {
+    padding: 2px 6px;
+    height: 28px;
+    font-size: 12.5px;
+    box-sizing: border-box;
+  }
+
+  /* textarea.text-input: 複数行入力欄（備考欄など）
+   * 初期状態と最小の高さを36pxに圧縮し、縦方向のみユーザーがリサイズ（拡大）できるようにしています。 */
   textarea.text-input {
     resize: vertical;
     min-height: 36px;
@@ -42,7 +78,18 @@
     font-size: 12px;
   }
 
-  /* 【入力画面専用】注意書きボックス（コンパクト化） */
+  /* .field-group-container: ラジオボタンやチェックボックスを横並びにする枠
+   * 最小の高さを24pxに圧縮し、文字の中央揃えを行っています。 */
+  .field-group-container {
+    display: flex;
+    align-items: center;
+    min-height: 24px;
+    font-size: 12.5px;
+    color: #334155;
+  }
+
+  /* .notice-box: 注意事項を囲む赤/ピンク系の警告ボックス
+   * 角丸やパディングを調整してコンパクトにし、左側に赤いアクセント線を入れています。 */
   .notice-box {
     grid-column: span 2;
     background: #fef2f2;
@@ -56,6 +103,8 @@
     margin-top: 2px;
   }
 
+  /* .notice-title: 注意事項ボックス内のタイトル（「注意事項」の文字）
+   * 文字を太く、少し濃い赤色にして目立たせています。 */
   .notice-box .notice-title {
     font-weight: bold;
     color: #7f1d1d;
@@ -66,7 +115,11 @@
     gap: 4px;
   }
 
-  /* 【入力画面専用】エラーメッセージ */
+
+  
+
+  /* .error-msg: 入力エラー時（未入力など）に出る赤い警告テキスト
+   * 初期状態では display: none; で隠しておき、JSでエラー判定された時だけ表示されます。 */
   .error-msg {
     color: #dc2626;
     font-size: 10px;
@@ -74,45 +127,160 @@
     display: none;
   }
 
-  /* 【入力画面専用】ラジオ・チェックボックスコンテナ（最小高さを36px ➔ 24pxに圧縮） */
-  .field-group-container {
+
+  /*　260820追加
+
+  /* 【A：承認モード時】承認・差戻しボタンエリア ------------------- */
+  .form-approval-area {
+    margin-top: 24px;
+    padding: 20px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+
+    /* パネル全体の幅を絞り、親要素内で中央寄せ */
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* 承認・差戻しボタン配置 */
+  .approval-btn-group {
     display: flex;
+    justify-content: center;
     align-items: center;
-    min-height: 24px;
-    font-size: 12.5px;
-    color: #334155;
+    gap: 24px;
+    width: 100%;
+    margin-top: 10px;
   }
 
-  /* 【入力全般・ラベル圧縮】入力領域の高さをコンパクト化 */
-  label {
-    display: inline-block;
-    font-size: 11.5px;
-    margin-bottom: 1px;
+  /* 承認ボタン (青) - 共通 .btn-primary の影響を完全上書き */
+  .btn-primary.btn-primary-rich {
+    width: 100% !important;
+    max-width: 240px !important;
+    height: 44px !important;
+    padding: 0 16px !important;
+    font-size: 15px !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2em !important;
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+    box-sizing: border-box !important;
+  }
+  .btn-primary.btn-primary-rich:hover {
+    background-color: #1d4ed8 !important;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35) !important;
   }
 
-  .text-input,
-  input[type="text"],
-  input[type="date"],
-  input[type="number"],
-  input[type="email"],
-  select.text-input {
-    padding: 2px 6px;
-    height: 28px;
-    font-size: 12.5px;
+  /* 差戻しボタン用（赤） */
+  .btn-reject {
+    width: 100% ;
+    max-width: 240px ;
+    height: 44px ;
+    padding: 0 16px ;
+    font-size: 15px ;
+    font-weight: bold ;
+    letter-spacing: 0.2em ;
+    background-color: #dc2626 ;
+    color: #ffffff ;
+    border: none ;
+    border-radius: 8px ;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25) ;
+    box-sizing: border-box ;
+    display: inline-flex ;
+    align-items: center ;
+    justify-content: center ;
+  }
+  .btn-reject:hover {
+    background-color: #b91c1c ;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35) ;
+  }
+
+  /* コメント欄ラベル */
+  .approval-comment-label {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  /* コメント入力枠（ボタン群の幅 240px*2 + gap 24px = 504px に合わせる） */
+  .approval-comment-box {
+    width: 100%;
+    max-width: 504px;
+    margin: 0 auto 16px auto;
+    display: block;
     box-sizing: border-box;
   }
 
-  /* 【送信ボタン】モーダル背景 */
+  /* 処理結果メッセージ */
+  .approval-result {
+    margin-top: 16px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+  }
+
+/* 【B：通常・再申請モード時】送信ボタンエリア ------------------- */
+  .form-submit-area {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* LINE送信ボタン */
+  .btn-line-submit {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: bold;
+    background-color: #ffffff;
+    color: #06c755;
+    border: 1px solid #06c755;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  /* LINE送信ボタンのエリア */
+  .line-notice-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+
+
+  /* ==========================================
+   * 3. モーダル（送信完了ポップアップ）のスタイル
+   * ========================================== */
+
+  /* .modal-overlay: モーダルの背景（画面全体を覆う黒半透明の膜）
+   * 背面を少しぼかす（backdrop-filter）効果を入れ、最前面に表示させています。 */
   .modal-overlay {
     position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(15, 23, 42, 0.4);
     backdrop-filter: blur(2px);
-    display: flex; justify-content: center; align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     z-index: 1000;
   }
 
-  /* 【送信ボタン】モーダル本体 */
+  /* .modal-content: モーダルの白い本体パネル
+   * 角丸や影をつけ、表示される際に「ぽわん」と拡大するアニメーション（modalPop）を適用しています。 */
   .modal-content {
     background: #ffffff;
     padding: 28px 24px;
@@ -124,32 +292,79 @@
     animation: modalPop 0.2s ease-out;
   }
 
+  /* modalPop: モーダル表示時の拡大アニメーション（少し縮んだ状態から100%サイズになる） */
   @keyframes modalPop {
-    from { transform: scale(0.92); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+    from {
+      transform: scale(0.92);
+      opacity: 0;
+    }
+
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
 
-  /* 【送信ボタン】チェックマークアイコン */
+  /* .modal-icon: 送信完了時の中央の「✓」アイコンの丸い背景枠
+   * 綺麗な緑色の円を作り、チェックマークを中央に配置しています。 */
   .modal-icon {
-    width: 44px; height: 44px; background: #dcfce7; color: #16a34a;
-    border-radius: 50%; font-size: 22px; font-weight: bold;
-    display: flex; align-items: center; justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: #dcfce7;
+    color: #16a34a;
+    border-radius: 50%;
+    font-size: 22px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 0 auto 12px auto;
   }
 
-  /* 【送信ボタン】スピナー */
+  /* .spinner: 送信中などに表示されるくるくる回るローディングアイコン
+   * CSSアニメーション（spin）で永遠に回転し続けます。 */
   .spinner {
-    width: 14px; height: 14px;
-    border: 2px solid #ffffff; border-top-color: transparent;
-    border-radius: 50%; animation: spin 0.8s linear infinite;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ffffff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* モーダル専用スタイル上書き: フォーム画面で指定した h3 のデザインをリセット
+   * フォーム内の青い線や背景色を消し、単なる中央揃えの太字タイトルに戻しています。 */
+  .modal-content h3 {
+    border-left: none;
+    background: transparent;
+    padding: 0;
+    margin: 0 0 6px 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+    text-align: center;
+  }
+
+  /* .modal-sub: モーダル内の説明文（「一覧画面へ移動します...」など） */
+  .modal-sub {
+    margin: 0 0 18px 0;
+    font-size: 13px;
+    color: #64748b;
+  }
+
 
   /* ==========================================
-   追加：1060px化 ＆ 左右2カラムレイアウト枠
-   ========================================== */
+   * 4. 画面全体の2カラム構造（フォーム領域 ＋ 履歴領域）
+   * ========================================== */
 
-  /* 全体のカード幅を 1060px に変更（パディングを20px ➔ 10px 16pxへ縮小） */
+  /* .form-card-1060: 画面全体を包む白いカード型の外枠
+   * 左右のカラムを収めるために最大幅を1060pxと広めに取り、パディングはコンパクトにしています。 */
   .form-card-1060 {
     max-width: 1060px;
     margin: 0 auto;
@@ -160,26 +375,29 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
 
-  /* 左右分割用コンテナ */
+  /* .layout-2col: 左の「入力フォーム」と右の「処理履歴」を並べるコンテナ
+   * Flexboxを使って横並びにし、16pxの隙間を空けています。 */
   .layout-2col {
     display: flex;
     gap: 16px;
     align-items: flex-start;
   }
 
-  /* 左側：既存の入力フォームをそのまま入れる領域 */
+  /* .layout-main-form: 左側の入力フォーム領域
+   * 余った幅をすべて占有（flex: 1）し、画面幅が縮んだ際に要素がはみ出さないよう min-width: 0 を設定しています。 */
   .layout-main-form {
     flex: 1;
     min-width: 0;
   }
 
-  /* 右側：履歴情報エリア（幅 300px） */
+  /* .layout-side-history: 右側の処理履歴領域
+   * 幅を300pxに固定し、画面が縮んでもこの領域が潰れない（flex-shrink: 0）ようにしています。 */
   .layout-side-history {
     width: 300px;
     flex-shrink: 0;
   }
 
-  /* 履歴情報ボックスの基本枠 */
+  /* .side-history-box: 右側の履歴を表示するパネル全体の背景・枠線デザイン */
   .side-history-box {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
@@ -188,6 +406,7 @@
     font-size: 12px;
   }
 
+  /* .side-history-title: 履歴パネル上部の「【処理履歴】」というタイトル */
   .side-history-title {
     font-weight: bold;
     color: #1e293b;
@@ -197,22 +416,10 @@
     padding-bottom: 2px;
   }
 
-  /* 右側履歴エリアが長い場合に単体でスクロールする設定 */
+  /* #historyListArea: 履歴が追加されて長くなった際のスクロール制御
+   * 縦幅が480pxを超えた場合、領域内だけでスクロールバーが出るようにしています。 */
   #historyListArea {
     max-height: 480px;
     overflow-y: auto;
   }
-
-  /* 履歴情報 個別デザイン */
-.side-history-box {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 8px 10px;
-}
-
-#historyListArea {
-  max-height: 480px;
-  overflow-y: auto;
-}
 </style>

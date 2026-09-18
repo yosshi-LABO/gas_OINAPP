@@ -3,7 +3,7 @@
   var currentMode = (typeof mode !== 'undefined') ? mode : 'new';
   var isApproval = (currentMode === 'approval');
   var dis = isApproval ? 'disabled' : '';
-  var disStyle = isApproval ? 'background-color: #f1f5f9; cursor: not-allowed;' : '';
+  var disClass = isApproval ? 'disabled-field' : '';
 ?>
 <!DOCTYPE html>
 <html>
@@ -14,6 +14,7 @@
     <?!= include('css_common'); ?>
     <?!= include('css_form'); ?>
   </style>
+    <?!= include('js_common'); ?>
 </head>
 
 <body>
@@ -36,25 +37,22 @@
       <!-- フォームエリア -->
       <div class="form-grid">
 
-      <!-- 申請日 -->
       <div>
-        <label>申請日 <span style="color: #999; font-size: 11px;">*自動入力</span></label>
-        <input type="date" id="appDate" class="text-input" value="<?= formData.applicationDate ?>" readonly style="background-color: #e9ecef; cursor: not-allowed;">
+        <label>申請日 <span class ="text-hosoku">*自動入力</span></label>
+        <input type="date" id="applicationDate" class="text-input input-readonly" value="<?= formData.applicationDate ?>" readonly>
       </div>
 
-      <!-- 起案番号 -->
       <div>
-        <label>起案番号 <span style="color: #999; font-size: 11px;">*自動採番</span></label>
-        <input type="text" id="refNum" class="text-input" value="<?= formData.referenceNumber ?>" readonly style="background-color: #e9ecef; cursor: not-allowed;">
+        <label>起案番号 <span class ="text-hosoku">*自動採番</span></label>
+        <input type="text" id="refNum" class="text-input input-readonly" value="<?= formData.refNum ?>" readonly>
       </div>
       
 
       <h3>— 申請者情報 —</h3>
 
-      <!-- 所属会社 (必須) -->
       <div>
-        <label>所属会社 <span style="color: red;">*</span></label>
-        <select id="company" class="text-input" onchange="validateField('company')" <?= dis ?> style="<?= disStyle ?>">
+        <label>所属会社 <span class="text-danger">*</span></label>
+        <select id="companyName" class="text-input <?= disClass ?>" onchange="validateField('companyName')" <?= dis ?>>
           <option value=""> --選択してください-- </option>
           <option value="MGT株式会社" <?= formData.companyName === 'MGT株式会社' ? 'selected' : '' ?>>MGT株式会社</option>
           <option value="XHD株式会社" <?= formData.companyName === 'XHD株式会社' ? 'selected' : '' ?>>XHD株式会社</option>
@@ -64,36 +62,32 @@
           <option value="XYL株式会社" <?= formData.companyName === 'XYL株式会社' ? 'selected' : '' ?>>XYL株式会社</option>
           <option value="その他の会社名" <?= formData.companyName === 'その他の会社名' ? 'selected' : '' ?>>その他の会社名(所属部署欄に記入下さい)</option>
         </select>
-        <div id="companyError" class="error-msg"></div>
+        <div id="companyNameError" class="error-msg"></div>
       </div>
 
-      <!-- 所属部署 (必須) -->
       <div>
-        <label>所属部署 <span style="color: red;">*</span></label>
-        <input type="text" id="deptName" class="text-input" value="<?= formData.deptName ?>" placeholder="例: 情報システム部" <?= dis ?> style="<?= disStyle ?>">
+        <label>所属部署 <span class="text-danger">*</span></label>
+        <input type="text" id="deptName" placeholder="例: システム部" class="text-input <?= disClass ?>" value="<?= formData.deptName ?>" <?= dis ?>>
         <div id="deptNameError" class="error-msg"></div>
       </div>
 
-      <!-- 申請者ID (必須) -->
       <div>
-        <label>申請者ID <span style="color: red;">*</span></label>
-        <input type="text" id="employeeId" class="text-input" value="<?= formData.employeeId ?>" placeholder="例: 012345" maxlength="6" <?= dis ?> style="<?= disStyle ?>">
+        <label>申請者ID <span class="text-danger">*</span></label>
+        <input type="text" id="employeeId" placeholder="例: 012345" maxlength="6" class="text-input <?= disClass ?>" value="<?= formData.employeeId ?>" <?= dis ?>>
         <div id="employeeIdError" class="error-msg"></div>
       </div>
 
-      <!-- 申請者名 (必須) -->
       <div>
-        <label>申請者名 <span style="color: red;">*</span></label>
-        <input type="text" id="employeeName" class="text-input" value="<?= formData.employeeName ?>" <?= dis ?> style="<?= disStyle ?>">
+        <label>申請者名 <span class="text-danger">*</span></label>
+        <input type="text" id="employeeName" class="text-input <?= disClass ?>" value="<?= formData.employeeName ?>" <?= dis ?>>
         <div id="employeeNameError" class="error-msg"></div>
       </div>
 
-      <!-- 所属部署種別 (必須) -->
       <div>
-        <label>所属部署種別 <span style="color: red;">*</span></label>
+        <label>所属部署種別 <span class="text-danger">*</span></label>
         <div class="field-group-container" style="gap: 20px;">
-          <input type="radio" name="deptType" value="オフィス" <?= formData.departmentType === 'オフィス' ? 'checked' : '' ?> <?= dis ?>> オフィス
-          <input type="radio" name="deptType" value="店舗" <?= formData.departmentType === '店舗' ? 'checked' : '' ?> <?= dis ?>> 店舗
+          <input type="radio" name="deptType" value="オフィス" <?= formData.deptType === 'オフィス' ? 'checked' : '' ?> <?= dis ?>> オフィス
+          <input type="radio" name="deptType" value="店舗" <?= formData.deptType === '店舗' ? 'checked' : '' ?> <?= dis ?>> 店舗
         </div>
       </div>
 
@@ -105,67 +99,58 @@
         ・相手先が異なる場合、別途新規で申請してください。
       </div>
 
-      <!-- 押印が必要な会社 -->
       <div class="full-width">
-        <label>押印が必要な会社（複数選択可） <span style="color: red;">*</span></label>
+        <label>押印が必要な会社（複数選択可） <span class="text-danger">*</span></label>
         <div class="field-group-container" style="flex-wrap: nowrap; gap: 24px; overflow-x: auto;">
-          <input type="checkbox" name="sealCompany" value="MGT" <?= formData.sealCompanies.indexOf('MGT') !== -1 ? 'checked' : '' ?> <?= dis ?>> MGT
-          <input type="checkbox" name="sealCompany" value="XHD" <?= formData.sealCompanies.indexOf('XHD') !== -1 ? 'checked' : '' ?> <?= dis ?>> XHD
-          <input type="checkbox" name="sealCompany" value="XFS" <?= formData.sealCompanies.indexOf('XFS') !== -1 ? 'checked' : '' ?> <?= dis ?>> XFS
-          <input type="checkbox" name="sealCompany" value="XCS" <?= formData.sealCompanies.indexOf('XCS') !== -1 ? 'checked' : '' ?> <?= dis ?>> XCS
-          <input type="checkbox" name="sealCompany" value="XNT" <?= formData.sealCompanies.indexOf('XNT') !== -1 ? 'checked' : '' ?> <?= dis ?>> XNT
-          <input type="checkbox" name="sealCompany" value="XYL" <?= formData.sealCompanies.indexOf('XYL') !== -1 ? 'checked' : '' ?> <?= dis ?>> XYL
+          <input type="checkbox" name="sealCompany" value="MGT" <?= formData.sealCompany.indexOf('MGT') !== -1 ? 'checked' : '' ?> <?= dis ?>> MGT
+          <input type="checkbox" name="sealCompany" value="XHD" <?= formData.sealCompany.indexOf('XHD') !== -1 ? 'checked' : '' ?> <?= dis ?>> XHD
+          <input type="checkbox" name="sealCompany" value="XFS" <?= formData.sealCompany.indexOf('XFS') !== -1 ? 'checked' : '' ?> <?= dis ?>> XFS
+          <input type="checkbox" name="sealCompany" value="XCS" <?= formData.sealCompany.indexOf('XCS') !== -1 ? 'checked' : '' ?> <?= dis ?>> XCS
+          <input type="checkbox" name="sealCompany" value="XNT" <?= formData.sealCompany.indexOf('XNT') !== -1 ? 'checked' : '' ?> <?= dis ?>> XNT
+          <input type="checkbox" name="sealCompany" value="XYL" <?= formData.sealCompany.indexOf('XYL') !== -1 ? 'checked' : '' ?> <?= dis ?>> XYL
         </div>
         <div id="sealCompanyError" class="error-msg"></div>
       </div>
 
-      <!-- 相手先会社名 -->
       <div>
         <label>相手先会社名</label>
-        <input type="text" id="clientCompany" class="text-input" value="<?= formData.clientCompany ?>" placeholder="例: 株式会社トリヒキサキ" <?= dis ?> style="<?= disStyle ?>">
+        <input type="text" id="clientCompany" placeholder="例: 株式会社トリヒキサキ" class="text-input <?= disClass ?>" value="<?= formData.clientCompany ?>" <?= dis ?>>
       </div>
 
-      <!-- グリッドエリア -->
       <div class="grid-4cols">
-        <!-- 1. 書類名 -->
         <div>
-          <label>書類名 <span style="color: red;">*</span></label>
-          <input type="text" id="documentName" class="text-input" value="<?= formData.documentName ?>" placeholder="例: 業務委託契約書" <?= dis ?> style="<?= disStyle ?>">
+          <label>書類名 <span class="text-danger">*</span></label>
+          <input type="text" id="documentName" placeholder="例: 業務委託契約書" class="text-input <?= disClass ?>" value="<?= formData.documentName ?>" <?= dis ?>>
           <div id="documentNameError" class="error-msg"></div>
         </div>
 
-        <!-- 2. 部数 -->
         <div>
           <label>部数</label>
-          <input type="number" id="copies" class="text-input" value="<?= formData.copies ?>" <?= dis ?> style="<?= disStyle ?>">
+          <input type="number" id="copies" class="text-input <?= disClass ?>" value="<?= formData.copies ?>" <?= dis ?>>
         </div>
 
-        <!-- 3. 必要押印 -->
         <div>
           <label>必要押印</label>
-          <select id="sealType" class="text-input" <?= dis ?> style="<?= disStyle ?>">
+          <select id="sealType" class="text-input <?= disClass ?>" <?= dis ?>>
             <option value="社印(角印)" <?= formData.sealType === '社印(角印)' ? 'selected' : '' ?>>社印(角印)</option>
             <option value="社印(丸印)" <?= formData.sealType === '社印(丸印)' ? 'selected' : '' ?>>社印(丸印)</option>
           </select>
         </div>
 
-        <!-- 4. 稟決番号 -->
         <div>
           <label>稟決番号</label>
-          <input type="text" id="approvalNum" class="text-input" value="<?= formData.approvalNum ?>" placeholder="例: RNG2608-9999" <?= dis ?> style="<?= disStyle ?>">
+          <input type="text" id="approvalNum" placeholder="例: RNG2608-9999" class="text-input <?= disClass ?>" value="<?= formData.approvalNum ?>" <?= dis ?>>
         </div>
       </div>
 
-      <!-- 備考 -->
       <div class="full-width">
         <label>備考</label>
-        <textarea id="remarks" class="text-input" rows="3" <?= dis ?> style="<?= disStyle ?>"><?= formData.remarks ?></textarea>
+        <textarea id="remarks" rows="3" placeholder="例: 割印をお願いたします。" class="text-input <?= disClass ?>" <?= dis ?>><?= formData.remarks ?></textarea>
       </div>
 
-      <!-- 承認者メールアドレス -->
       <div class="form-group">
-        <label for="approverEmail">【承認依頼用】承認者メールアドレス <span style="color: red;">*</span></label>
-        <input type="email" id="approverEmail" class="text-input" value="<?= formData.approverEmail ?>" placeholder="例: approver@example.com" <?= dis ?> style="<?= disStyle ?>">
+        <label for="approverEmail">【承認依頼用】承認者メールアドレス <span class="text-danger">*</span></label>
+        <input type="email" id="approverEmail" placeholder="例: sei-mei@company.co.jp" class="text-input <?= disClass ?>" value="<?= formData.approverEmail ?>" <?= dis ?>>
         <div id="approverEmailError" class="error-msg"></div>
       </div>
 
@@ -173,43 +158,43 @@
       <!-- ▼ ボタン・操作エリア（モードによって動的切り替え） -->
       <? if (isApproval) { ?>
         <!-- 【承認モード時】承認・差戻し操作エリア -->
-        <div class="full-width" style="margin-top: 24px; padding: 20px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+        <div class="full-width form-approval-area">
           <? var isProcessed = (formData.status && formData.status !== '申請中'); ?>
           <? if (isProcessed) { ?>
-            <div style="background: #fef2f2; color: #991b1b; padding: 12px; border-radius: 6px; border: 1px solid #fecaca; text-align: center; font-weight: bold; font-size: 14px;">
+            <div class="alert-warning">
               ⚠️ この申請はすでに「<?= formData.status ?>」処理が完了しています。
             </div>
           <? } else { ?>
-            <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">
-              コメント欄　<span style="color: #dc2626; font-weight: bold;">※差戻しの場合は必須</span>
+            <div class="approval-comment-label">
+              コメント欄　<span class="text-danger">※差戻しの場合は必須</span>
             </div>
-            <textarea id="approvalComment" class="text-input" rows="3" placeholder="コメントを入力してください" style="width: 100%; box-sizing: border-box; margin-bottom: 16px;"></textarea>
+            <textarea id="approvalComment" class="text-input approval-comment-box" rows="3" placeholder="コメントを入力してください"></textarea>
             
-            <div id="approvalBtnGroup" style="display: flex; gap: 12px;">
-              <button type="button" id="btnApprove" onclick="submitApprovalAction('approve')" style="flex: 1; height: 44px; font-size: 15px; font-weight: bold; background-color: #2563eb; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; transition: opacity 0.2s;">
+            <div class="approval-btn-group">
+              <button type="button" id="btnApprove" onclick="submitApprovalAction('approve')" class="btn-primary btn-primary-rich">
                 承認
               </button>
-              <button type="button" id="btnReject" onclick="submitApprovalAction('reject')" style="flex: 1; height: 44px; font-size: 15px; font-weight: bold; background-color: #dc2626; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; transition: opacity 0.2s;">
+              <button type="button" id="btnReject" onclick="submitApprovalAction('reject')" class="btn-reject">
                 差戻
               </button>
             </div>
           <? } ?>
-          <div id="approvalResult" style="margin-top: 16px; text-align: center; font-weight: bold; font-size: 15px;"></div>
+          <div id="approvalResult" class="approval-result"></div>
         </div>
       <? } else { ?>
         <!-- 【通常・再申請モード時】送信ボタンエリア -->
-        <div class="full-width" style="margin-top: 28px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+        <div class="full-width form-submit-area">
           
           <!-- メイン：Gmail送信ボタン -->
-          <button type="button" id="btnGmail" onclick="sendData('gmail')" class="btn-submit btn-gmail" style="width: 100%; height: 48px; font-size: 16px; font-weight: bold; background-color: #2563eb; color: #ffffff; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(37,99,235,0.2);">
-            <span class="btn-text">申請する（メール通知）</span>
+          <button type="button" id="btnGmail" onclick="sendData('gmail')" class="btn-primary btn-primary-rich">
+            <span class="btn-text">申請</span>
             <span class="spinner" style="display: none;"></span>
           </button>
-
-          <!-- サブ：LINE送信ボタンエリア -->
-          <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; color: #64748b; margin-top: 4px;">
+          
+          <!-- サブ：LINE送信ボタン -->
+          <div class="line-notice-area">
             <span>LINEで通知を受け取りたい方はこちら ➔</span>
-            <button type="button" id="btnLine" onclick="sendData('line')" class="btn-submit btn-line" style="padding: 6px 14px; font-size: 12px; font-weight: bold; background-color: #ffffff; color: #06c755; border: 1px solid #06c755; border-radius: 20px; cursor: pointer; transition: all 0.2s;">
+            <button type="button" id="btnLine" onclick="sendData('line')" class="btn-line-submit">
               <span class="btn-text">LINE通知</span>
               <span class="spinner" style="display: none;"></span>
             </button>
@@ -219,23 +204,21 @@
       <? } ?>
 
       <!-- 送信・処理完了モーダル (モダンデザイン版) -->
-      <div id="successModal" class="modal-overlay" style="display: none; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px);">
-        <div id="modalCard" style="background: #ffffff; border-radius: 12px; padding: 24px 28px; width: 320px; text-align: center; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0;">
-        
-          <!-- アイコン領域（JSで動的変更） -->
-          <div id="modalIcon" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 22px; font-weight: bold;">
-          ✓
-          </div>
+      <div id="successModal" class="modal-overlay" style="display: none;">
+        <div id="modalCard" class="modal-content">
 
+          <!-- アイコン領域 -->
+          <div id="modalIcon" class="modal-icon">✓</div>
+          
           <!-- タイトル & 短い案内文 -->
-          <h3 id="modalTitle" style="margin: 0 0 4px 0; font-size: 17px; font-weight: 700; color: #0f172a;">完了しました</h3>
-          <p id="modalSub" style="margin: 0 0 18px 0; font-size: 13px; color: #64748b;">一覧画面へ移動します...</p>
-
-          <!-- 控えめなOKボタン -->
-          <a id="modalOkBtn" href="<?= ScriptApp.getService().getUrl() ?>?page=list" target="_top" style="display: block; width: 100%; height: 38px; line-height: 38px; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; box-sizing: border-box; transition: all 0.2s;">
-          OK
+          <h3 id="modalTitle">完了ーここの文字はJSで書き変わりますー</h3>
+          <p id="modalSub" class="modal-sub">一覧画面へ自動遷移します...</p>
+          
+          <!-- OKボタン -->
+          <a id="modalOkBtn" href="<?= ScriptApp.getService().getUrl() ?>?page=list" target="_top" class="btn-secondary">
+          OK（一覧画面に戻る）
           </a>
-
+          
         </div>
       </div>
 
@@ -257,69 +240,300 @@
     </div> <!-- /layout-2col -->
   </div> <!-- /form-card-1060 -->
 
+
+
+
+
+  <!-- ▼JavaScript部分 ------------------------------------------------------------------------>
   <script>
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+     * =========================================================================
+     * 1. バリデーションルールの定義（設定データ）
+     * =========================================================================
+     * 各入力項目の検証ルールを一元管理する配列です。
+     * 今後フォーム項目が増減した場合も、この配列を編集するだけで自動適用されます。
+     * 
+     * 【プロパティ説明】
+     * - id       : HTML側の要素ID（エラー表示用要素は id + 'Error' と想定）
+     * - type     : フォーム要素の種別（'text' または 'checkbox'）
+     * - required : 必須項目かどうか（true / false）
+     * - pattern  : 正規表現のチェックパターン（任意）
+     * - message  : エラー発生時に表示するメッセージテキスト
+     */
+    var validationRules = [
+      { id: 'companyName',   type: 'text',     required: true,  message: 'ここは必須項目です。' },
+      { id: 'deptName',      type: 'text',     required: true,  message: 'ここは必須項目です。' },
+      { id: 'employeeId',    type: 'text',     pattern: /^\d{6}$/, message: '社員番号は半角6桁での記入(先頭0埋め)が必要です。' },
+      { id: 'employeeName',  type: 'text',     required: true,  message: 'ここは必須項目です。' },
+      { id: 'sealCompany',   type: 'checkbox', required: true,  message: '最低1つ選択してください。' },
+      { id: 'documentName',  type: 'text',     required: true,  message: 'ここは必須項目です。' },
+      { id: 'approverEmail', type: 'text',     required: true,  message: 'ここは必須項目です。' }
+    ];
+
+
+    /**
+     * =========================================================================
+     * 💡 判定ヘルパー関数（単一ルールの検証）
+     * =========================================================================
+     * 受け取った1つのルール（rule）に対して、入力値が違反しているか判定します。
+     * @param {Object} rule - validationRules 内の1オブジェクト
+     * @returns {boolean} - エラーがある場合は true、正常な場合は false を返却
+     */
+    function checkRuleError(rule) {
+      // --------------------------------------------------
+      // A. チェックボックス群の判定ロジック
+      // --------------------------------------------------
+      if (rule.type === 'checkbox') {
+        // name属性が一致する選択済み（:checked）のチェックボックスを取得
+        var checked = document.querySelectorAll('input[name="' + rule.id + '"]:checked');
+        
+        // 必須設定で、選択数が0件の場合はエラー(true)
+        if (rule.required) {
+          if (checked.length === 0) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      // --------------------------------------------------
+      // B. テキスト入力等の判定ロジック
+      // --------------------------------------------------
+      var elem = document.getElementById(rule.id);
+      
+      // 対象要素がDOM上に存在しない場合はチェックをスキップ（正常扱い）
+      if (!elem) {
+        return false;
+      }
+
+      // 前後の不要な空白を除去した入力値を取得
+      var val = elem.value.trim();
+
+      // 必須チェック：必須指定があるのに値が空ならエラー(true)
+      if (rule.required) {
+        if (val === "") {
+          return true;
+        }
+      }
+
+      // 正規表現パターンチェック：値が入力されている場合のみ形式検証
+      if (val) {
+        if (rule.pattern) {
+          // 正規表現パターンに合致しない場合はエラー(true)
+          if (!rule.pattern.test(val)) {
+            return true;
+          }
+        }
+      }
+
+      // すべてのチェックをクリアした場合は正常(false)
+      return false;
+    }
+
+
+    /**
+     * =========================================================================
+     * 💡 3. リアルタイム単一項目バリデーション
+     * =========================================================================
+     * 各入力欄のフォーカスが外れた際（onblur等）に個別に呼び出されます。
+     * 正しく入力されていれば、その項目のエラーメッセージをリアルタイムで非表示にします。
+     * @param {string} fieldId - チェック対象の要素ID
+     */
     function validateField(fieldId) {
-      if (fieldId === 'company' && document.getElementById('company').value.trim() !== "") {
-        document.getElementById('companyError').style.display = 'none';
+      // 定義配列から対象フィールドIDに該当するルールを取得
+      var rule = validationRules.find(function(r) { return r.id === fieldId; });
+      
+      // 該当するルールが未定義なら何もしない
+      if (!rule) {
+        return;
       }
-      if (fieldId === 'deptName' && document.getElementById('deptName').value.trim() !== "") {
-        document.getElementById('deptNameError').style.display = 'none';
+
+      // 対応するエラーメッセージ表示要素を取得
+      var errElem = document.getElementById(rule.id + 'Error');
+      
+      // エラー表示領域が存在しない場合は何もしない
+      if (!errElem) {
+        return;
       }
-      if (fieldId === 'employeeId') {
-        var val = document.getElementById('employeeId').value.trim();
-        if (/^\d{6}$/.test(val)) {
-          document.getElementById('employeeIdError').style.display = 'none';
-        }
-      }
-      if (fieldId === 'employeeName' && document.getElementById('employeeName').value.trim() !== "") {
-        document.getElementById('employeeNameError').style.display = 'none';
-      }
-      if (fieldId === 'documentName' && document.getElementById('documentName').value.trim() !== "") {
-        document.getElementById('documentNameError').style.display = 'none';
-      }
-      if (fieldId === 'sealCompany') {
-        var checked = document.querySelectorAll('input[name="sealCompany"]:checked');
-        if (checked.length > 0) {
-          document.getElementById('sealCompanyError').style.display = 'none';
-        }
+
+      // 単一要素のエラー判定を実行
+      var isError = checkRuleError(rule);
+
+      // エラーが解消（isError === false）されていれば赤文字メッセージを隠す
+      if (!isError) {
+        errElem.style.display = 'none';
       }
     }
 
-    // ★ モーダル表示制御共通関数
+
+    /**
+     * =========================================================================
+     * 💡 4. フォーム全体チェック & 送信処理
+     * =========================================================================
+     * 送信ボタン押下時に起動。全ルールのループ検証を行い、
+     * エラーがなければ二重送信防止制御をかけてGASバックエンドへデータを送信します。
+     * @param {string} notifyType - 通知種別（'line' または 'gmail'）
+     */
+    function sendData(notifyType) {
+      var isValid = true;             // フォーム全体の検証成功フラグ
+      var firstErrorElement = null;   // エラー時に最初にフォーカスさせるHTML要素
+
+      // --------------------------------------------------
+      // STEP 1: 全ルールのループ一括チェック
+      // --------------------------------------------------
+      validationRules.forEach(function(rule) {
+        var errElem = document.getElementById(rule.id + 'Error');
+        
+        // 共通ヘルパー関数でエラー有無を判定
+        var isError = checkRuleError(rule);
+
+        if (isError) {
+          // 【エラーあり】メッセージのセットと表示
+          if (errElem) {
+            errElem.textContent = rule.message;
+            errElem.style.display = 'block';
+          }
+          // 最初にエラーになった入力要素を保持（スクロール/フォーカス用）
+          if (!firstErrorElement) {
+            if (rule.type !== 'checkbox') {
+              firstErrorElement = document.getElementById(rule.id);
+            }
+          }
+          isValid = false; // 全体検証を「失敗」に設定
+        } else {
+          // 【エラーなし】メッセージを非表示
+          if (errElem) {
+            errElem.style.display = 'none';
+          }
+        }
+      });
+
+      // エラーが1点でもあれば、最初に引っかかった項目にフォーカスして処理中断
+      if (!isValid) {
+        if (firstErrorElement) {
+          firstErrorElement.focus();
+        }
+        return;
+      }
+
+      // --------------------------------------------------
+      // STEP 2: 二重送信防止 & ローディング UI 制御
+      // --------------------------------------------------
+      var btnLine = document.getElementById('btnLine');
+      var btnGmail = document.getElementById('btnGmail');
+      var targetBtn = (notifyType === 'line') ? btnLine : btnGmail;
+      
+      // ボタンの無効化（連打防止）
+      if (btnLine) btnLine.disabled = true;
+      if (btnGmail) btnGmail.disabled = true;
+      
+      var btnTextElem = targetBtn ? targetBtn.querySelector('.btn-text') : null;
+      var spinnerElem = targetBtn ? targetBtn.querySelector('.spinner') : null;
+      var originalText = btnTextElem ? btnTextElem.textContent : "";
+
+      // スピナー回転表示と文言変更
+      if (btnTextElem) btnTextElem.textContent = "送信中...";
+      if (spinnerElem) spinnerElem.style.display = "inline-block";
+
+      // --------------------------------------------------
+      // STEP 3: 送信パラメータ用データの抽出・整形
+      // --------------------------------------------------
+      // 押印会社（チェックボックス群）の選択値を配列化
+      var checkedSeal = document.querySelectorAll('input[name="sealCompany"]:checked');
+      var selectedSealCompany = [];
+      checkedSeal.forEach(function(checkbox) {
+        selectedSealCompany.push(checkbox.value);
+      });
+      
+      // 部署種別（ラジオボタン）の選択値取得
+      var selectedDeptElem = document.querySelector('input[name="deptType"]:checked');
+      var selectedDept = selectedDeptElem ? selectedDeptElem.value : "";
+
+      // バックエンド（GAS）渡すデータオブジェクトの構築
+      var data = {
+        applicationDate: document.getElementById('applicationDate').value,
+        refNum: document.getElementById('refNum').value,
+        companyName: document.getElementById('companyName').value.trim(),
+        deptName: document.getElementById('deptName').value.trim(),
+        employeeId: document.getElementById('employeeId').value.trim(),
+        employeeName: document.getElementById('employeeName').value.trim(),
+        deptType: selectedDept,
+        sealCompany: selectedSealCompany.join(', '), // カンマ区切り文字列に変換
+        clientCompany: document.getElementById('clientCompany').value,
+        documentName: document.getElementById('documentName').value.trim(),
+        copies: document.getElementById('copies').value,
+        sealType: document.getElementById('sealType').value,
+        approvalNum: document.getElementById('approvalNum').value,
+        remarks: document.getElementById('remarks').value,
+        approverEmail: document.getElementById('approverEmail').value.trim(),
+        notifyType: notifyType
+      };
+
+      // --------------------------------------------------
+      // STEP 4: GAS バックエンド関数の非同期呼び出し
+      // --------------------------------------------------
+      google.script.run
+        .withSuccessHandler(function(res) {
+          // 成功時UI復旧 & 完了モーダル表示
+          if (spinnerElem) spinnerElem.style.display = "none";
+          if (btnTextElem) btnTextElem.textContent = originalText;
+          showCompletionModal('success', '送信完了');
+        })
+        .withFailureHandler(function(error) {
+          // 失敗時UIロック解除 & アラート表示
+          if (btnLine) btnLine.disabled = false;
+          if (btnGmail) btnGmail.disabled = false;
+          if (spinnerElem) spinnerElem.style.display = "none";
+          if (btnTextElem) btnTextElem.textContent = originalText;
+          alert("送信に失敗しました: " + error.message);
+        })
+        .submitData(data);
+    }
+
+
+
+
+
+
+
+    
+    /**
+    * 💡 5. 処理完了時のモーダルポップアップ表示 & 自動遷移
+    * 送信・承認・差戻しの完了時にモーダルダイアログを表示し、1.5秒後に一覧画面へ移動します。
+    * @param {string} type - 'reject'（差戻し）または 'success'（成功・承認）
+    * @param {string} titleText - モーダルに表示するタイトルテキスト（例：「送信完了」「承認完了」）
+    */
     function showCompletionModal(type, titleText) {
       var successModal = document.getElementById('successModal');
       var modalIcon = document.getElementById('modalIcon');
       var modalTitle = document.getElementById('modalTitle');
-      var modalOkBtn = document.getElementById('modalOkBtn');
+      // 引数で受け取ったタイトルをそのままセット
+      if (modalTitle) modalTitle.textContent = titleText 
 
-      if (type === 'reject') {
-        // 【差戻し時】ローズレッド基調
-        if (modalIcon) {
+      // 処理種別に応じたアイコン表示とCSSクラスの切替
+      if (modalIcon) {
+        if (type === 'reject') {
           modalIcon.textContent = '↩';
-          modalIcon.style.backgroundColor = '#fef2f2';
-          modalIcon.style.color = '#dc2626';
-        }
-        if (modalTitle) modalTitle.textContent = titleText || '差戻し完了';
-        if (modalOkBtn) {
-          modalOkBtn.style.backgroundColor = '#fef2f2';
-          modalOkBtn.style.color = '#991b1b';
-          modalOkBtn.style.border = '1px solid #fecaca';
-        }
-      } else {
-        // 【申請・承認時】エメラルドグリーン基調
-        if (modalIcon) {
-          modalIcon.textContent = '✓';
-          modalIcon.style.backgroundColor = '#f0fdf4';
-          modalIcon.style.color = '#16a34a';
-        }
-        if (modalTitle) modalTitle.textContent = titleText || '送信完了';
-        if (modalOkBtn) {
-          modalOkBtn.style.backgroundColor = '#f0fdf4';
-          modalOkBtn.style.color = '#15803d';
-          modalOkBtn.style.border = '1px solid #bbf7d0';
+         modalIcon.className = 'modal-icon icon-reject';
+        } else {
+         modalIcon.textContent = '✓';
+         modalIcon.className = 'modal-icon icon-success';
         }
       }
 
+      // モーダルを表示（flexレイアウトで中央寄せ）
       if (successModal) successModal.style.display = 'flex';
 
       // 1.5秒（1500ms）後に一覧画面へ自動遷移
@@ -328,161 +542,23 @@
       }, 1500);
     }
 
-    function sendData(notifyType) {
-      var isValid = true;
-      var firstErrorElement = null;
 
-      var company = document.getElementById('company').value.trim();
-      var companyErr = document.getElementById('companyError');
-      if (company === "") {
-        companyErr.textContent = "ここは必須項目です。";
-        companyErr.style.display = "block";
-        if (!firstErrorElement) firstErrorElement = document.getElementById('company');
-        isValid = false;
-      } else {
-        companyErr.style.display = "none";
-      }
-
-      var deptName = document.getElementById('deptName').value.trim();
-      var deptNameErr = document.getElementById('deptNameError');
-      if (deptName === "") {
-        deptNameErr.textContent = "ここは必須項目です。";
-        deptNameErr.style.display = "block";
-        if (!firstErrorElement) firstErrorElement = document.getElementById('deptName');
-        isValid = false;
-      } else {
-        deptNameErr.style.display = "none";
-      }
-
-      var employeeId = document.getElementById('employeeId').value.trim();
-      var empErr = document.getElementById('employeeIdError');
-      if (!/^\d{6}$/.test(employeeId)) {
-        empErr.textContent = "社員番号は半角6桁での記入(先頭0埋め)が必要です。";
-        empErr.style.display = "block";
-        if (!firstErrorElement) firstErrorElement = document.getElementById('employeeId');
-        isValid = false;
-      } else {
-        empErr.style.display = "none";
-      }
-
-      var employeeName = document.getElementById('employeeName').value.trim();
-      var nameErr = document.getElementById('employeeNameError');
-      if (employeeName === "") {
-        nameErr.textContent = "ここは必須項目です。";
-        nameErr.style.display = "block";
-        if (!firstErrorElement) firstErrorElement = document.getElementById('employeeName');
-        isValid = false;
-      } else {
-        nameErr.style.display = "none";
-      }
-
-      var checkedSeal = document.querySelectorAll('input[name="sealCompany"]:checked');
-      var sealErr = document.getElementById('sealCompanyError');
-      if (checkedSeal.length === 0) {
-        sealErr.textContent = "最低1つ選択してください。";
-        sealErr.style.display = "block";
-        isValid = false;
-      } else {
-        sealErr.style.display = "none";
-      }
-
-      var documentName = document.getElementById('documentName').value.trim();
-      var docErr = document.getElementById('documentNameError');
-      if (documentName === "") {
-        docErr.textContent = "ここは必須項目です。";
-        docErr.style.display = "block";
-        if (!firstErrorElement) firstErrorElement = document.getElementById('documentName');
-        isValid = false;
-      } else {
-        docErr.style.display = "none";
-      }
-
-      var approverEmail = document.getElementById('approverEmail').value.trim();
-      var approverEmailErr = document.getElementById('approverEmailError');
-      if (approverEmail === "") {
-        approverEmailErr.textContent = "ここは必須項目です。";
-        approverEmailErr.style.display = "block";
-        if (!firstErrorElement) firstErrorElement = document.getElementById('approverEmail');
-        isValid = false;
-      } else {
-        approverEmailErr.style.display = "none";
-      }
-
-      if (!isValid) {
-        if (firstErrorElement) firstErrorElement.focus();
-        return;
-      }
-
-      var btnLine = document.getElementById('btnLine');
-      var btnGmail = document.getElementById('btnGmail');
-      var targetBtn = (notifyType === 'line') ? btnLine : btnGmail;
-      
-      if (btnLine) btnLine.disabled = true;
-      if (btnGmail) btnGmail.disabled = true;
-      
-      var btnTextElem = targetBtn ? targetBtn.querySelector('.btn-text') : null;
-      var spinnerElem = targetBtn ? targetBtn.querySelector('.spinner') : null;
-      var originalText = btnTextElem ? btnTextElem.textContent : "";
-
-      if (btnTextElem) btnTextElem.textContent = "送信中...";
-      if (spinnerElem) spinnerElem.style.display = "inline-block";
-
-      var selectedSealCompanies = [];
-      checkedSeal.forEach(function(checkbox) {
-        selectedSealCompanies.push(checkbox.value);
-      });
-
-      var selectedDept = document.querySelector('input[name="deptType"]:checked').value;
-
-      var data = {
-        applicationDate: document.getElementById('appDate').value,
-        referenceNumber: document.getElementById('refNum').value,
-        companyName: company,
-        deptName: deptName,
-        employeeId: employeeId,
-        employeeName: employeeName,
-        departmentType: selectedDept,
-        sealCompanies: selectedSealCompanies.join(', '),
-        clientCompany: document.getElementById('clientCompany').value,
-        documentName: documentName,
-        copies: document.getElementById('copies').value,
-        sealType: document.getElementById('sealType').value,
-        approvalNum: document.getElementById('approvalNum').value,
-        remarks: document.getElementById('remarks').value,
-        approverEmail: document.getElementById('approverEmail').value,
-        notifyType: notifyType
-      };
-
-      google.script.run
-        .withSuccessHandler(function(res) {
-          if (spinnerElem) spinnerElem.style.display = "none";
-          if (btnTextElem) btnTextElem.textContent = originalText;
-
-          // モーダル共通処理の呼び出し
-          showCompletionModal('success', '送信完了');
-        })
-        .withFailureHandler(function(error) {
-          if (btnLine) btnLine.disabled = false;
-          if (btnGmail) btnGmail.disabled = false;
-          if (spinnerElem) spinnerElem.style.display = "none";
-          if (btnTextElem) btnTextElem.textContent = originalText;
-
-          alert("送信に失敗しました: " + error.message);
-        })
-        .submitData(data);
-    }
-
-    // 承認・差戻し実行処理
+    /*
+    * 💡 6. 承認・差戻しアクション実行処理
+    * @param {string} action - アクション種別（'approve' または 'reject'）
+    */
     function submitApprovalAction(action) {
       var commentElem = document.getElementById("approvalComment");
       var comment = commentElem ? commentElem.value : "";
       var isReject = (action === "reject");
-
+      
+      // 差戻しの場合はコメント（理由）の入力を必須化
       if (isReject && !comment.trim()) {
         alert("差戻しを行う場合は、コメント（理由）の入力が必須です。");
         return;
       }
 
+      // 連打防止のため承認・差戻しボタンを無効化
       var approveBtn = document.getElementById("btnApprove");
       var rejectBtn = document.getElementById("btnReject");
       if (approveBtn) approveBtn.disabled = true;
@@ -490,13 +566,20 @@
 
       var refNum = document.getElementById("refNum").value;
 
+
+      // GASのサーバー側関数 processApprovalAction(refNum, action, comment) を非同期実行
       google.script.run
         .withSuccessHandler(function(res) {
           if (res.success) {
             var isRejectAction = (action === 'reject');
-            // ステータスに応じて共通モーダルを表示
-            showCompletionModal(isRejectAction ? 'reject' : 'success', res.newStatus + '完了');
+            
+            // 処理種別に応じたタイトルでモーダルを表示
+            var modalTitle = isRejectAction ? '差戻し完了' : '承認完了';
+            
+            showCompletionModal(isRejectAction ? 'reject' : 'success', modalTitle);
+
           } else {
+            // サーバー側でエラーが返却された場合
             document.getElementById("approvalResult").innerText = "エラー: " + res.message;
             document.getElementById("approvalResult").style.color = "#dc2626";
             if (approveBtn) approveBtn.disabled = false;
@@ -504,6 +587,7 @@
           }
         })
         .withFailureHandler(function(err) {
+          // 通信失敗・例外時
           alert("エラーが発生しました: " + err.message);
           if (approveBtn) approveBtn.disabled = false;
           if (rejectBtn) rejectBtn.disabled = false;
@@ -511,74 +595,27 @@
         .processApprovalAction(refNum, action, comment);
     }
 
-    function resetFormModal() {
-      document.getElementById('successModal').style.display = 'none';
 
-      document.getElementById('clientCompany').value = '';
-      document.getElementById('documentName').value = '';
-      document.getElementById('copies').value = '1';
-      document.getElementById('approvalNum').value = '';
-      document.getElementById('remarks').value = '';
-
-      var checkboxes = document.querySelectorAll('input[name="sealCompany"]');
-      checkboxes.forEach(function(cb) { cb.checked = false; });
-
-      var btnLine = document.getElementById('btnLine');
-      var btnGmail = document.getElementById('btnGmail');
-      if (btnLine) btnLine.disabled = false;
-      if (btnGmail) btnGmail.disabled = false;
-
-      google.script.run
-        .withSuccessHandler(function(nextRefNum) {
-          document.getElementById('refNum').value = nextRefNum;
-        })
-        .getNextReferenceNumber();
-    }
-
-    // 処理履歴（タイムライン）描画
+    /**
+    * 💡 7.処理履歴（タイムライン）の描画処理
+    * サーバーから埋め込まれた `formData.history` データを読み込み、
+    * 共通モジュール(js_common)の `generateTimelineHtml` 関数で生成されたHTMLを適用します。
+    */
     function renderHistory() {
       var historyArea = document.getElementById('historyListArea');
       if (!historyArea) return;
 
+      // テンプレートスクリプトタグ経由でGASから渡された履歴オブジェクト配列を取得
       var rawHistory = <?!= JSON.stringify(formData.history || []) ?>;
-      var historyList = [];
+      
+      // 共通関数（js_common）を呼び出してタイムラインHTMLを割り当て
+      historyArea.innerHTML = generateTimelineHtml(rawHistory);
+    }                   // ↘️　generateTimelineHtml は共有ファイル(js_common)内にあります。
 
-      try {
-        if (rawHistory) {
-          historyList = (typeof rawHistory === 'string') ? JSON.parse(rawHistory) : rawHistory;
-        }
-      } catch(e) {
-        historyList = [];
-      }
-
-      var timelineHtml = '';
-      if (Array.isArray(historyList) && historyList.length > 0) {
-        historyList.forEach(function(h) {
-          var commentStr = h.comment ? '<div class="timeline-comment">コメント: ' + h.comment + '</div>' : '';
-          var emailStr = h.email ? ' (' + h.email + ')' : '';
-
-          timelineHtml += '<div class="timeline-item">'
-                       + '<span class="timeline-action">[' + (h.action || '') + ']</span> '
-                       + '<span class="timeline-time">' + (h.time || '') + '</span>'
-                       + '<div class="timeline-user">' + (h.user || '') + emailStr + '</div>'
-                       + commentStr
-                       + '</div>';
-        });
-      } else {
-        timelineHtml += '<div style="font-size: 12px; color: #94a3b8;">処理履歴はありません</div>';
-      }
-
-      historyArea.innerHTML = timelineHtml;
-    }
-
-    // 読み込み完了イベントの発生前・発生後どちらでも確実に実行する
-    if (document.readyState === 'loading') {
-      window.addEventListener('DOMContentLoaded', renderHistory);
-    } else {
+    // ページ内のDOM構築完了時(読込時)に履歴描画を実行
+    window.addEventListener('DOMContentLoaded', function() {
       renderHistory();
-    }
-    
-
+    });
   </script>
 </body>
 </html>

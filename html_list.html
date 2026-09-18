@@ -7,6 +7,7 @@
     <?!= include('css_common'); ?>
     <?!= include('css_list'); ?>
   </style> 
+    <?!= include('js_common'); ?>
 </head>
 
 <body>
@@ -27,7 +28,7 @@
       <!-- 検索エリア -->
       <div class="search-bar">
         <input type="text" id="keyword" class="search-input text-input" placeholder="起案番号、申請者名、書類名などで検索..." onkeypress="handleKeyPress(event)">
-        <button class="search-btn" onclick="loadData()">検索</button>
+        <button class="btn-primary search-btn" onclick="loadData()">検索</button>
       </div>
 
       <!-- データ一覧テーブル -->
@@ -43,8 +44,9 @@
               <th>状態</th>
             </tr>
           </thead>
+          <!-- 👇 JSで動的に上書きされる箇所 -->
           <tbody id="tableBody">
-            <tr><td colspan="6" style="text-align: center; color: #6b7280; padding: 24px;">データを読み込み中...</td></tr>
+            <tr><td colspan="6" class="empty-row-msg">検索中...</td></tr>
           </tbody>
         </table>
 
@@ -61,11 +63,11 @@
     <!-- ▼ 2. 詳細参照エリア ----------------------------------->
     <div id="detailSection" class="detail-card">
 
-      <!-- ヘッダー＆ステータス表示＆戻るボタン（即座に押せるよう右上に配置） -->
+      <!-- ヘッダー＆ステータス表示＆戻るボタン -->
       <div class="detail-header">
         <div class="detail-header-left">
           <h3 class="detail-title">押印申請 詳細情報</h3>
-          <span id="detailStatusBadge" class="badge">-</span>
+          <span id="detailStatusBadge">-</span>
         </div>
         <button type="button" onclick="backToList()" class="btn-secondary">
           ← 一覧画面に戻る
@@ -93,17 +95,21 @@
 
   </div>
 
-  <!-- ▼JavaScript部分 -->
+  <!-- ▼JavaScript部分 ------------------------------------------------------------------------>
   <script>
+  /**
+   * フィールドキーから日本語項目名への変換マップ
+   * 詳細画面のラベル表示で使用します。
+   */
   var labelMap = {
     applicationDate: '申請日',
-    referenceNumber: '起案番号',
+    refNum: '起案番号',
     companyName: '起案会社',
     deptName: '所属部署',
     employeeId: '申請者ID',
     employeeName: '申請者名',
     deptType: '部署種別',
-    sealCompanies: '押印が必要な会社',
+    sealCompany: '押印が必要な会社',
     partnerCompany: '相手先会社名',
     documentName: '書類名',
     copies: '部数',
@@ -112,13 +118,16 @@
     remarks: '備考'
   };
 
-  // グループごとのフィールド定義（ご指定いただいた圧縮構成を適用）
+  /**
+   * 詳細画面の表示セクション＆グリッドレイアウト設定
+   * 各項目の表示順および CSS Grid の `grid-column`（スパン幅）を定義します。
+   */
   var detailSectionsConfig = [
     {
       title: '基本情報',
       fields: [
         { key: 'applicationDate', span: 'span 6' },
-        { key: 'referenceNumber', span: 'span 6' }
+        { key: 'refNum', span: 'span 6' }
       ]
     },
     {
@@ -134,7 +143,7 @@
     {
       title: '書類情報',
       fields: [
-        { key: 'sealCompanies',  span: 'span 6' },
+        { key: 'sealCompany',  span: 'span 6' },
         { key: 'partnerCompany', span: 'span 6' },
         { key: 'documentName',   span: 'span 5' },
         { key: 'copies',         span: 'span 1' },
@@ -145,30 +154,43 @@
     }
   ];
 
-  var allData = [];
-  var currentPage = 1;
-  var rowsPerPage = 10;
+  // --- グローバル状態管理変数 ---
+  var allData = [];      // バックエンドから取得した全申請データリスト
+  var currentPage = 1;  // 現在の表示ページ番号
+  var rowsPerPage = 10; // 1ページあたりの表示件数
 
+  // 画面ロード完了時にデータを自動取得
   window.onload = function() {
     loadData();
   };
 
+
+  /**
+   * 検索窓での Enter キー押下検知ハンドラ
+   * @param {KeyboardEvent} e - キーボードイベント
+   */
   function handleKeyPress(e) {
     if (e.keyCode === 13) {
       loadData();
     }
   }
 
+
+  /**
+   * 申請一覧データの非同期取得処理
+   * 検索キーワードをもとに GAS バックエンド（getFilteredData）からデータを読み込みます。
+   */
   function loadData() {
     var keyword = document.getElementById('keyword').value;
     var tbody = document.getElementById('tableBody');
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #6b7280; padding: 24px;">検索中...</td></tr>';
+    // ロード中のスケルトン表示
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-row-msg">検索中...</td></tr>';
 
     google.script.run
       .withSuccessHandler(function(data) {
         allData = data || [];
-        currentPage = 1;
-        renderTable();
+        currentPage = 1; // ページを1ページ目にリセット
+        renderTable();    // テーブル再描画
       })
       .withFailureHandler(function(error) {
         alert("データの取得に失敗しました: " + error.message);
@@ -177,38 +199,47 @@
       .getFilteredData(keyword);
   }
 
+
+  /**
+   * テーブル行データおよびページネーションのレンダリング
+   * 現在のページ番号（currentPage）に応じて `allData` から10件分を切り出して描画します。
+   */
   function renderTable() {
     var tbody = document.getElementById('tableBody');
     tbody.innerHTML = "";
 
+    // 該当データが0件の場合のメッセージ表示
     if (allData.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #6b7280; padding: 24px;">該当するデータが見つかりませんでした。</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-row-msg">該当するデータが見つかりませんでした。</td></tr>';
       if (document.getElementById('pageInfo')) document.getElementById('pageInfo').textContent = '0 / 0 ページ';
       if (document.getElementById('prevBtn')) document.getElementById('prevBtn').disabled = true;
       if (document.getElementById('nextBtn')) document.getElementById('nextBtn').disabled = true;
       return;
     }
-
+  
+    // 現在のページに応じたデータのスライス位置計算
     var startIndex = (currentPage - 1) * rowsPerPage;
     var endIndex = startIndex + rowsPerPage;
     var displayData = allData.slice(startIndex, endIndex);
 
+    // 行（<tr>）要素の生成とクリックイベント付与
     displayData.forEach(function(row) {
       var tr = document.createElement('tr');
       tr.title = "クリックして詳細を表示";
-      tr.onclick = function() { showDetail(row); };
-
+      tr.onclick = function() { showDetail(row); }; // 行クリックで詳細表示へ遷移
+      
       tr.innerHTML = `
         <td>${row.applicationDate || ''}</td>
-        <td><strong>${row.referenceNumber || ''}</strong></td>
+        <td><strong>${row.refNum || ''}</strong></td>
         <td>${row.companyName || ''}</td>
         <td>${row.employeeName || ''}</td>
         <td>${row.documentName || ''}</td>
-        <td><span class="badge">${row.status || ''}</span></td>
-      `;
+        <td><span class="status-badge ${getStatusClass(row.status)}">${row.status|| ''}
+        `;
       tbody.appendChild(tr);
     });
 
+    // ページネーションコントロール（ページ番号・前へ/次へボタン状態）の更新
     var totalPages = Math.ceil(allData.length / rowsPerPage);
     if (document.getElementById('pageInfo')) {
       document.getElementById('pageInfo').textContent = `${currentPage} / ${totalPages} ページ（全 ${allData.length} 件）`;
@@ -217,29 +248,32 @@
     if (document.getElementById('nextBtn')) document.getElementById('nextBtn').disabled = (currentPage >= totalPages);
   }
 
+
+  /**
+   * ページ切替（前へ / 次へ）ボタン処理
+   * @param {number} direction - ページ移動方向（-1 または 1）
+   */
   function changePage(direction) {
     currentPage += direction;
     renderTable();
   }
 
+
+  /**
+   * 選択行の申請詳細画面表示処理
+   * テーブルで選択されたオブジェクトを受け取り、CSS Grid形式で各項目を出力します。
+   * @param {Object} row - 一覧テーブルから受け取った単一の申請データオブジェクト
+   */
   function showDetail(row) {
     var gridContainer = document.getElementById('detailGrid');
     gridContainer.innerHTML = '';
 
-    // 1. ステータスバッジ
+    // 1. ステータスバッジのラベルとデザイン色の切り替え
     var statusBadge = document.getElementById('detailStatusBadge');
-    var statusText = row.status || '申請中';
-    statusBadge.textContent = statusText;
-    
-    if (statusText === '承認完了') {
-      statusBadge.style.backgroundColor = '#dcfce7'; statusBadge.style.color = '#166534';
-    } else if (statusText === '差戻し') {
-      statusBadge.style.backgroundColor = '#fee2e2'; statusBadge.style.color = '#991b1b';
-    } else {
-      statusBadge.style.backgroundColor = '#e0f2fe'; statusBadge.style.color = '#075985';
-    }
+    statusBadge.textContent = row.status;
+    statusBadge.className = `status-badge ${getStatusClass(row.status)}`; 
 
-    // 2. セクションごとにレンダリング
+    // 2. 設定オブジェクト（detailSectionsConfig）に基づいてセクションと各項目を自動動的生成
     detailSectionsConfig.forEach(function(section) {
       var titleHtml = `<div class="detail-section-title">— ${section.title} —</div>`;
       gridContainer.insertAdjacentHTML('beforeend', titleHtml);
@@ -258,44 +292,38 @@
       });
     });
       
-    // 3. 処理履歴（タイムライン）の描画
+    // 3. 該当レコードの処理履歴（タイムライン）描画
     var metaArea = document.getElementById('detailMetaArea');
-    var historyList = [];
-    try {
-      if (row.history) {
-        historyList = (typeof row.history === 'string') ? JSON.parse(row.history) : row.history;
-      }
-    } catch(e) { historyList = []; }
 
-    var timelineHtml = '<div class="timeline-title">【処理履歴】</div>';
-    if (historyList.length > 0) {
-      historyList.forEach(function(h) {
-        var commentStr = h.comment ? `<div class="timeline-comment">コメント: ${h.comment}</div>` : '';
-        var emailStr = h.email ? ` (${h.email})` : '';
-        
-        timelineHtml += `
-          <div class="timeline-item">
-            <span class="timeline-action">[${h.action || ''}]</span> 
-            <span class="timeline-time">${h.time || ''}</span>
-            <div class="timeline-user">${h.user || ''}${emailStr}</div>
-            ${commentStr}
-          </div>
-        `;
-      });
-    } else {
-      timelineHtml += '<div style="font-size: 12px; color: #94a3b8;">処理履歴はありません</div>';
-    }
-
+    // 共通関数（js_common）を利用してタイムラインHTMLを生成・セット
+    var timelineHtml = '<div class="timeline-title">【処理履歴】</div>'
+       + generateTimelineHtml(row.history); // ↘️　generateTimelineHtml は共有ファイル(js_common)内にあります。
     metaArea.innerHTML = timelineHtml;
 
+    // 画面表示の切替（一覧を隠して詳細を表示）
     document.getElementById('listSection').style.display = 'none';
     document.getElementById('detailSection').style.display = 'block';
-  }
+  }                    
 
+
+  /**
+   * 詳細画面から一覧画面へ戻るボタン処理（今度は一つ上のソースとは逆に、詳細を隠して一覧を表示）
+   */
   function backToList() {
     document.getElementById('detailSection').style.display = 'none';
     document.getElementById('listSection').style.display = 'block';
   }
+
+
+  /**
+   * ステータス文字列に応じたCSSクラス名を返す
+   */
+  function getStatusClass(status) {
+    if (status === '承認完了') return 'status-approved';
+    if (status === '差戻し') return 'status-rejected';
+    return 'status-pending'; // 「申請中」または初期値
+  }
+
   </script>
 </body>
 </html>

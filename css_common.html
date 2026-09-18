@@ -1,23 +1,28 @@
 <style>
+  /* ==========================================
+   *  全画面共有・複数画面共有のCSS 
+   * ========================================== */
+
   /* 【全画面共通】画面全体の背景色、基本フォント、余白を設定 */
-  body { 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
-    padding: 24px 16px; 
-    background: #f1f5f9; 
-    color: #334155;
+  body {
     margin: 0;
+    padding: 24px 16px;
+    background: #f1f5f9;
+    color: #334155;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
-    
+
   /* 【全画面共通】画面中央に配置される白背景のメインカード枠 */
-  .container, .card { 
-    background: #ffffff; 
-    padding: 28px 36px; 
-    border-radius: 12px; 
-    max-width: 860px; 
+  .container,
+  .card {
+    max-width: 860px;
     margin: 0 auto;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
-    box-sizing: border-box;
+    padding: 28px 36px;
+    background: #ffffff;
     border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
   }
 
   /* 【全画面共通】ヘッダーエリア */
@@ -32,14 +37,14 @@
 
   /* 【全画面共通】ページ最上部の大見出しタイトル */
   h2 {
-    margin: 0;
-    font-size: 19px;
-    color: #0f172a;
-    font-weight: 700;
-    letter-spacing: -0.01em;
     display: flex;
     align-items: center;
     gap: 10px;
+    margin: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.01em;
   }
 
   /* 【全画面共通】タイトルの左側に配置するアクセントバー */
@@ -52,28 +57,43 @@
     border-radius: 3px;
   }
 
+  /* 必須マーク・補足テキスト */
+  .text-danger {
+    color: #dc2626;
+  }
+
+  .text-hosoku {
+    color: #999999;
+    font-size: 11px;
+  }
+
+
+  /* ==========================================
+   *  入力・詳細表示画面の要素
+   * ========================================== */
+
   /* 【全画面共通】入力項目上の見出しラベル */
   label {
     display: block;
+    margin-bottom: 4px;
     font-size: 12px;
     font-weight: 600;
     color: #475569;
-    margin-bottom: 4px;
   }
 
   /* 【全画面共通】テキスト入力・日付・セレクトボックス等の標準入力枠 */
   .text-input {
     width: 100%;
+    margin-bottom: 0px;
     padding: 8px 12px;
-    margin-bottom: 0px; /* グリッドのgapで制御するため0に */
-    box-sizing: border-box;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
     font-family: inherit;
-    font-size: 13.5px;
+    font-size: 13px;
     color: #1e293b;
     background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
     transition: all 0.15s ease-in-out;
+    box-sizing: border-box;
   }
 
   /* 【全画面共通】入力枠にフォーカスが当たった時 */
@@ -83,18 +103,63 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
   }
 
-  /* 【全画面共通】画面遷移用ボタン */
+  /* 読み取り専用・非活性フィールド */
+  .input-readonly,
+  .disabled-field {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+  }
+
+
+  /* ==========================================
+   * 【共通】ボタンコンポーネント
+   * ========================================== */
+
+
+
+   /* .search-btn: 検索実行ボタン
+   * 幅120pxで青色ベースのボタンスタイルです。 */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    padding: 0 20px; /* 文字数に合わせて伸び縮みさせる */
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    box-sizing: border-box;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* 少し控えめで上品な影 */
+    transition: background-color 0.2s, box-shadow 0.2s;
+  }
+
+  .btn-primary:hover {
+    background-color: #1d4ed8;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+  }
+
+  /* 1. サブボタン（一覧画面に戻るなど）基本スタイル */
   .btn-secondary {
-    display: inline-block;
-    padding: 6px 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
     background-color: #f1f5f9;
     color: #475569;
     border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 12.5px;
-    font-weight: 600;
-    text-decoration: none;
+    border-radius: 8px;
+    box-sizing: border-box;
     transition: all 0.2s;
+    cursor: pointer;
   }
 
   .btn-secondary:hover {
@@ -102,35 +167,58 @@
     color: #0f172a;
   }
 
+  /* 2. モーダル内での配置調整（親要素経由で適用） */
+  .modal-content .btn-secondary {
+    display: flex;
+    width: 100%;
+  }
+
 
   /* ==========================================
-     【共通】処理履歴（タイムライン）スタイル
-     ========================================== */
-  /* 処理履歴（タイムライン） */
+   *  アラート & メッセージ
+   * ========================================== */
+  /* アラート・メッセージボックス */
+  .alert-warning {
+    padding: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    color: #991b1b;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+  }
+
+
+
+  /* ==========================================
+   *  処理履歴(タイムライン)
+   * ========================================== */
   .detail-meta-area {
+    max-height: 420px;
     padding: 10px 12px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    max-height: 420px;
-    overflow-y: auto; /* 履歴が多くなっても右側単体でスクロール */
+    overflow-y: auto;
+    /* 履歴が多くなっても右側単体でスクロール */
   }
 
   .timeline-title {
-    font-weight: bold;
     margin-bottom: 8px;
-    color: #1e293b;
     font-size: 12.5px;
+    font-weight: bold;
+    color: #1e293b;
   }
 
   .timeline-item {
-    padding: 6px 8px;
     margin-bottom: 6px;
+    padding: 6px 8px;
+    font-size: 11.5px;
+    color: #334155;
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
-    font-size: 11.5px;
-    color: #334155;
   }
 
   .timeline-action {
@@ -139,9 +227,9 @@
   }
 
   .timeline-time {
-    color: #64748b;
-    font-size: 10.5px;
     margin-left: 4px;
+    font-size: 10.5px;
+    color: #64748b;
   }
 
   .timeline-user {

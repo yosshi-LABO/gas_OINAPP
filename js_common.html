@@ -1,0 +1,46 @@
+<script>
+/**
+ * 💡 履歴データ（JSON文字列または配列）を受け取り、タイムラインHTMLを生成する共通関数
+ * 
+ * 【ファイル仕様・命名理由】
+ * 区分: クライアント側（ブラウザ）JavaScript
+ * 拡張子: .html（GAS HtmlServiceの制約による）
+ * 
+ * 📝 〜なぜ .js ではなく .html なのか〜（忘れそうなので記載）
+ * GASのWebアプリでは、ブラウザ用JSを独立した外部 .js ファイルとして配信・読み込みができません。
+ * そのため <script> タグを含む .html ファイルとして作成し、サーバー側（HtmlService）で
+ * メインHTML内にインクルード（挿入）する設計にしています。
+ * 
+ * 　※ サーバー側処理（gs_*.js）との役割重複・誤解を防ぐため、接頭辞を js_ としています。
+ */
+function generateTimelineHtml(rawHistory) {
+  var historyList = [];
+
+  try {
+    if (rawHistory) {
+      historyList = (typeof rawHistory === 'string') ? JSON.parse(rawHistory) : rawHistory;
+    }
+  } catch(e) {
+    historyList = [];
+  }
+
+  var timelineHtml = '';
+  if (Array.isArray(historyList) && historyList.length > 0) {
+    historyList.forEach(function(h) {
+      var commentStr = h.comment ? '<div class="timeline-comment">コメント: ' + h.comment + '</div>' : '';
+      var emailStr = h.email ? ' (' + h.email + ')' : '';
+
+      timelineHtml += '<div class="timeline-item">'
+                   + '<span class="timeline-action">[' + (h.action || '') + ']</span> '
+                   + '<span class="timeline-time">' + (h.time || '') + '</span>'
+                   + '<div class="timeline-user">' + (h.user || '') + emailStr + '</div>'
+                   + commentStr
+                   + '</div>';
+    });
+  } else {
+    timelineHtml = '<div style="font-size: 12px; color: #94a3b8;">処理履歴はありません</div>';
+  }
+
+  return timelineHtml;
+}
+</script>

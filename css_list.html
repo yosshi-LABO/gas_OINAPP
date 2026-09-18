@@ -1,47 +1,57 @@
 <style>
   /* ==========================================
-     一覧・検索画面 スタイル
-     ========================================== */
+   * 1. 一覧・検索画面 全体レイアウト
+   * ========================================== */
 
-  /* 検索エリア */
+  /* .container-wide: 一覧画面専用の広幅コンテナ
+   * 共通CSS（css_common）の .container は max-width: 860px ですが、
+   * テーブル項目数を多く収めるために 1080px に拡大しています。 */
+  .container-wide {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  /* .search-bar: 検索入力欄とボタンを横並びにするコンテナ */
   .search-bar {
     display: flex;
     gap: 8px;
     margin-bottom: 16px;
   }
 
+  /* .search-input: 検索用テキストボックス
+   * flex: 1 で横幅いっぱいに伸縮させます。 */
   .search-input {
+    height: 38px;
     flex: 1;
     margin: 0;
   }
 
+  /* 「検索ボタン」btn-primaryでは横幅が足りないので個別指定 */
   .search-btn {
-    width: 120px;
-    background: #2563eb;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    width: 120px; 
   }
 
-  .search-btn:hover {
-    background: #1d4ed8;
-  }
 
-  /* テーブルコンテナ・テーブル基本デザイン */
+  /* ==========================================
+   * 2. データ一覧テーブル
+   * ========================================== */
+
+  /* .table-container: テーブルを包む枠
+   * 画面幅が狭くなった際に横スクロールできるようにしています。 */
   .table-container {
     width: 100%;
     overflow-x: auto;
   }
 
+  /* .custom-table: データ一覧のテーブル本体
+   * border-collapse: collapse で枠線の重複を消し、すっきり表示させます。 */
   .custom-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13.5px;
   }
 
+  /* テーブルのヘッダー（th）およびデータセル（td）共通 */
   .custom-table th,
   .custom-table td {
     padding: 10px 12px;
@@ -49,12 +59,14 @@
     border-bottom: 1px solid #e2e8f0;
   }
 
+  /* .custom-table th: ヘッダー行のデザイン（薄いグレー背景・濃い文字） */
   .custom-table th {
     background-color: #f8fafc;
     color: #475569;
     font-weight: 600;
   }
 
+  /* テーブルのデータ行（tr）：カーソルをポインター化しホバー効果を付与 */
   .custom-table tbody tr {
     cursor: pointer;
     transition: background-color 0.15s ease;
@@ -64,7 +76,23 @@
     background-color: #f1f5f9 !important;
   }
 
-  /* ページネーション */
+   /* .empty-row-msg: データ読み込み中・該当データなし時に表示する行スタイル */
+   /* ⚠️ ".empty-row-msg" だけではセンタリングされない理由
+    .custom-table td（クラス1つ＋要素1つ）の指定が .empty-row-msg（クラス1つのみ）よりも強力なため、text-align: left; に上書きされていました。
+    !important を使わずにCSSを綺麗に修復するには、セレクタに親要素を含めて優先順位を上げてあげれば解決します。
+   */
+   .custom-table td.empty-row-msg {
+    text-align: center;
+    color: #64748b;
+    padding: 24px;
+  }
+
+
+  /* ==========================================
+   * 3. ページネーション ＆ ステータスバッジ
+   * ========================================== */
+
+  /* .pagination-container: 前へ/次へボタンとページ件数を両端に配置するコンテナ */
   .pagination-container {
     margin-top: 16px;
     display: flex;
@@ -72,11 +100,13 @@
     align-items: center;
   }
 
+  /* .page-info: 「1 / 4 ページ（全 36 件）」のテキストスタイル */
   .page-info {
     font-size: 13px;
     color: #64748b;
   }
 
+  /* .btn-page: ページ切り替え用ボタン */
   .btn-page {
     padding: 6px 14px;
     background-color: #ffffff;
@@ -94,28 +124,54 @@
     color: #0f172a;
   }
 
+  /* 無効化時（先頭/末尾ページ）のボタン */
   .btn-page:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
-  /* ステータスバッジ */
-  .badge {
+
+  /* 0819追加ソース 
+  /* バッジ：ステータス（申請中、承認完了、差戻しなど）を示す丸角ラベルの共通スタイル */
+  /* 背景色、文字色は JavaScript 側でステータスに応じて動的に変更されます。 */
+  .status-badge {
     display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
+    padding: 4px 12px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: bold;
+    border-radius: 12px;
+    /* カプセル状にする */
     text-align: center;
   }
 
-  /* ==========================================
-     詳細画面 スタイル（左右2カラム・高密度化）
-     ========================================== */
+  /* 各ステータスの色設定 */
+  .status-pending {
+    /* 申請中 */
+    background-color: #e0f2fe;
+    color: #0369a1;
+  }
 
+  .status-approved {
+    /* 承認完了 */
+    background-color: #DCFCE7;
+    color: #15803D;
+  }
+
+  .status-rejected {
+    /* 差戻し */
+    background-color: #FEE2E2;
+    color: #B91C1C;
+  }
+
+  /* ==========================================
+   * 4. 詳細参照画面（左右2カラム構造）
+   * ========================================== */
+
+  /* .detail-card: 詳細エリア全体の白い外枠カード
+   * 初期状態は非表示（display: none;）にしておき、一覧選択時にJSで表示切り替えします。 */
   .detail-card {
     display: none;
-    max-width: 1060px; /* 横幅を拡張して左右分割に対応 */
+    max-width: 1060px;
     margin: 0 auto;
     padding: 20px;
     background: #ffffff;
@@ -124,6 +180,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
 
+  /* .detail-header: 詳細画面上部のヘッダー（タイトル・バッジと「一覧に戻る」ボタンを左右に配置） */
   .detail-header {
     display: flex;
     justify-content: space-between;
@@ -133,12 +190,14 @@
     margin-bottom: 14px;
   }
 
+  /* .detail-header-left: タイトルとステータスバッジを横並びに寄せるコンテナ */
   .detail-header-left {
     display: flex;
     align-items: center;
     gap: 12px;
   }
 
+  /* .detail-title: 詳細画面のメイン見出し */
   .detail-title {
     margin: 0;
     color: #0f172a;
@@ -146,32 +205,33 @@
     font-weight: 700;
   }
 
-  /* 左右2カラムレイアウト */
+  /* .detail-body-layout: メイン情報と処理履歴を左右分割するコンテナ */
   .detail-body-layout {
     display: flex;
     gap: 18px;
     align-items: flex-start;
   }
 
-  /* 左エリア（メイン情報） */
+  /* .detail-main-info: 左側の申請情報表示エリア（可変幅） */
   .detail-main-info {
     flex: 1;
     min-width: 0;
   }
 
-  /* 右エリア（処理履歴） */
+  /* .detail-side-info: 右側の処理履歴エリア（幅300px固定） */
   .detail-side-info {
     width: 300px;
     flex-shrink: 0;
   }
 
+  /* .detail-grid: 各項目を並べる12カラムの精密グリッドシステム */
   .detail-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    gap: 6px 8px; /* 上下左右の隙間を小さく縮小 */
+    gap: 6px 8px;
   }
 
-  /* セクション見出し */
+  /* .detail-section-title: 「— 基本情報 —」などのセクション区切り見出し */
   .detail-section-title {
     grid-column: span 12;
     font-size: 12px;
@@ -185,7 +245,7 @@
     margin-bottom: 0px;
   }
 
-  /* 各入力項目（コンパクト化） */
+  /* .detail-item: 個別のデータ表示セル（グレーの左線がついたコンパクトな枠） */
   .detail-item {
     padding: 4px 8px;
     background: #ffffff;
@@ -194,6 +254,7 @@
     border-radius: 4px;
   }
 
+  /* .detail-label: 項目名ラベル（「申請日」「起案会社」など） */
   .detail-label {
     font-size: 10.5px;
     color: #64748b;
@@ -201,22 +262,35 @@
     line-height: 1.2;
   }
 
+  /* .detail-value: 実際の値
+   * white-space: pre-wrap により、備考欄などの改行を維持して表示します。 */
   .detail-value {
     font-size: 13px;
     color: #0f172a;
     font-weight: 500;
     word-break: break-all;
     line-height: 1.25;
-    white-space: pre-wrap;　// 改行を表示させる
+    white-space: pre-wrap;
   }
 
-/* 履歴情報 個別デザイン */
-.detail-meta-area {
-  padding: 10px 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  max-height: 420px;
-  overflow-y: auto;
-}
+  /* .detail-meta-area: 右エリアの処理履歴（タイムライン）表示ボックス
+   * 高さが420pxを超えた場合は内部でスクロールできます。 */
+  .detail-meta-area {
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    max-height: 420px;
+    overflow-y: auto;
+  }
+
+  /* .timeline-title: 処理履歴ボックス内の見出し（「【処理履歴】」） */
+  .timeline-title {
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 4px;
+  }
 </style>
