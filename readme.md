@@ -8,7 +8,7 @@ Google Apps Script (GAS) と HTML/CSS/JavaScript で構築した、Webベース�
 ![アプリデモ画面](docs/GIF-demo.gif)
 
 ・テーブル構造
-<sub>
+<font size="10px">
 
 | 物理名 | 論理名 | 型（桁数）| 備考 |
 | :--- | :--- | :--- | :-- |
@@ -28,7 +28,7 @@ Google Apps Script (GAS) と HTML/CSS/JavaScript で構築した、Webベース�
 | remarks | 備考| String | |
 | approverEmail | 承認者メールアドレス| String | |
 
-</sub>
+</font>
 
 
 
