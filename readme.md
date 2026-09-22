@@ -13,6 +13,7 @@ Google Apps Script (GAS) と HTML/CSS/JavaScript で構築した、Webベース�
 
 <sub>
 
+```text
 物理名            論理名               型       備考
 ---------------------------------------------------
 refNum           起案番号             String   PK
