@@ -59,7 +59,7 @@ graph TD
     GAS -->|データ読み出し・追記| Sheet[(Google スプレッドシート<br>データベース)]
     GAS -->|承認・差戻し通知| Gmail[Gmail API<br>自動メール配信]
 
-```mermaid
+
 erDiagram
     APPLICATIONS_SHEET ||--o{ TIMELINE_SHEET: "refNumで紐付け (1対多)"
 
