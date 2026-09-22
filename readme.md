@@ -59,6 +59,7 @@ graph TD
     GAS -->|データ読み出し・追記| Sheet[("Google スプレッドシート<br>（データベース）")]
     GAS -->|承認・差戻し通知| Gmail["自動メール配信（Gmail API／.sendEmail()）"]
 
+---
 
 ### テーブル構成
 
