@@ -7,29 +7,34 @@ Google Apps Script (GAS) と HTML/CSS/JavaScript で構築した、Webベース�
 ・デモ画像（GIF）
 ![アプリデモ画面](docs/GIF-demo.gif)
 
-・テーブル構造
-<font size="10px">
 
-| 物理名 | 論理名 | 型（桁数）| 備考 |
-| :--- | :--- | :--- | :-- |
-| refNum | 起案番号| String | PK |
-| applicationDate | 申請日| date |  |
-| companyName | 起案会社 | String | |
-| deptName | 所属部署| String | |
-| employeeId | 申請者ID| String | |
-| employeeName | 申請者名| String | |
-| deptType | 所属部署種別| String | |
-| sealCompany | 押印が必要な会社| String | |
-| clientCompany | 相手先会社名| String | |
-| documentName | 書類名| String | |
-| copies | 必要な部数| Integer | |
-| sealType | 必要押印| String | |
-| approvalNum | 稟決番号| String | |
-| remarks | 備考| String | |
-| approverEmail | 承認者メールアドレス| String | |
+<details>
+<summary><b>テーブル定義（クリックで開く）</b></summary>
 
-</font>
+<sub>
 
+```text
+物理名            論理名               型       備考
+---------------------------------------------------
+refNum           起案番号             String   PK
+applicationDate  申請日               date
+companyName      起案会社             String
+deptName         所属部署             String
+employeeId       申請者ID             String
+employeeName     申請者名             String
+deptType         所属部署種別         String
+sealCompany      押印が必要な会社     String
+clientCompany    相手先会社名         String
+documentName     書類名               String
+copies           必要な部数           Integer
+sealType         必要押印             String
+approvalNum      稟決番号             String
+remarks          備考                 String
+approverEmail    承認者メールアドレス String
+
+</sub>
+
+</details>
 
 
 ## 📌 開発背景と課題解決
