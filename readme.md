@@ -36,7 +36,7 @@ approverEmail    承認者メールアドレス String
 
 </details>
 
-
+---
 
 ## 📌 開発背景と課題解決
 
