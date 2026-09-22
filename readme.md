@@ -52,3 +52,23 @@ GASを採用した最大の特徴は開発・稼働のスピード感です。�
 勤務先のグループウェアが Google Workspace であったため既存環境（ログインレスでユーザ取得が可）を最大活用する思想でしたが、外部メールアドレスであっても正常に動作する設計としています。
 
 ---
+
+
+```mermaid
+erDiagram
+    APPLICATIONS_SHEET ||--o{ TIMELINE_SHEET : "refNumで紐付け (1対多)"
+
+    APPLICATIONS_SHEET {
+        string refNum PK "申請番号"
+        string applicant "申請者"
+        string status "ステータス (申請中/承認/差戻し)"
+        string createdAt "申請日時"
+    }
+
+    TIMELINE_SHEET {
+        string refNum FK "申請番号"
+        string action "操作 (作成/承認/差戻し)"
+        string user "操作者"
+        string comment "コメント"
+        string timestamp "処理日時"
+    }
