@@ -55,7 +55,7 @@ GASを採用した最大の特徴は開発・稼働のスピード感です。�
 
 ```mermaid
 graph TD
-    Client[Webブラウザ<br>HTML / CSS / JS] -->|リクエスト / URLパラメータ| GAS[Google Apps Script<br>バックエンドAPI]
-    GAS -->|データ読み出し・追記| Sheet[(Google スプレッドシート<br>データベース)]
-    GAS -->|承認・差戻し通知| Gmail[Gmail API<br>自動メール配信]
+    Client[Webブラウザ<br>HTML / CSS / JS] -->|リクエスト / URLパラメータ| GAS[Google Apps Script<br>（バックエンド処理）]
+    GAS -->|データ読み出し・追記| Sheet[("Google スプレッドシート<br>（データベース）")]
+    GAS -->|承認・差戻し通知| Gmail["自動メール配信（Gmail API／.sendEmail()）"]
 
