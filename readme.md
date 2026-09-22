@@ -48,6 +48,8 @@ Google Apps Script (GAS) と HTML/CSS/JavaScript で構築した、Webベース�
 
 ### テーブル構成
 
+<small>
+
 | 物理名 | 論理名 | 型（桁数）| 備考 |
 | :--- | :--- | :--- | :-- |
 | refNum | 起案番号| String | PK |
@@ -66,7 +68,7 @@ Google Apps Script (GAS) と HTML/CSS/JavaScript で構築した、Webベース�
 | remarks | 備考| String | |
 | approverEmail | 承認者メールアドレス| String | |
 
-
+</small>
 
 
 ### 選定理由
@@ -81,6 +83,8 @@ graph TD
     GAS -->|データ読み出し・追記| Sheet[("Google スプレッドシート<br>（データベース）")]
     GAS -->|承認・差戻し通知| Gmail["自動メール配信（Gmail API／.sendEmail()）"]
 
----
+
+
+
 
 
