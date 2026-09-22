@@ -4,7 +4,7 @@ Google Apps Script (GAS) と HTML/CSS/JavaScript で構築した、Webベース�
 紙文書やハンコによる申請手続きのデジタル化・ペーパーレス化を実現し、承認プロセスのリアルタイム可視化および業務効率化を図るために開発しました。
 
 ---
-# デモ画像（GIF）
+・デモ画像（GIF）
 ![アプリデモ画面](docs/GIF-demo.gif)
 
 ## 📌 開発背景と課題解決
@@ -59,3 +59,23 @@ graph TD
     GAS -->|データ読み出し・追記| Sheet[("Google スプレッドシート<br>（データベース）")]
     GAS -->|承認・差戻し通知| Gmail["自動メール配信（Gmail API／.sendEmail()）"]
 
+
+```markdown
+```mermaid
+erDiagram
+    APPLICATIONS_SHEET ||--o{ TIMELINE_SHEET : "refNumで紐付け (1対多)"
+
+    APPLICATIONS_SHEET {
+        string refNum PK "申請番号"
+        string applicant "申請者"
+        string status "ステータス (申請中/承認/差戻し)"
+        string createdAt "申請日時"
+    }
+
+    TIMELINE_SHEET {
+        string refNum FK "申請番号"
+        string action "操作 (作成/承認/差戻し)"
+        string user "操作者"
+        string comment "コメント"
+        string timestamp "処理日時"
+    }
