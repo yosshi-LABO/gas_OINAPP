@@ -60,21 +60,23 @@ graph TD
     GAS -->|承認・差戻し通知| Gmail["自動メール配信（Gmail API／.sendEmail()）"]
 
 
-```mermaid
-erDiagram
-    APPLICATIONS_SHEET ||--o{ TIMELINE_SHEET : "refNumで紐付け (1対多)"
+・テーブル構成
+| 物理名 | 論理名 | 型（桁数）| 備考 |
+| :--- | :--- | :--- | :-- |
+| refNum | 起案番号| String | PK |
+| applicationDate | 申請日| date |  |
+| companyName | 起案会社 | String | |
+| deptName | 所属部署| String | |
+| employeeId | 申請者ID| String | |
+| employeeName | 申請者名| String | |
+| deptType | 所属部署種別| String | |
+| sealCompany | 押印が必要な会社| String | |
+| clientCompany | 相手先会社名| String | |
+| documentName | 書類名| String | |
+| copies | 必要な部数| Integer | |
+| sealType | 必要押印| String | |
+| approvalNum | 稟決番号| String | |
+| remarks | 備考| String | |
+| approverEmail | 承認者メールアドレス| String | |
 
-    APPLICATIONS_SHEET {
-        string refNum PK "申請番号"
-        string applicant "申請者"
-        string status "ステータス (申請中/承認/差戻し)"
-        string createdAt "申請日時"
-    }
 
-    TIMELINE_SHEET {
-        string refNum FK "申請番号"
-        string action "操作 (作成/承認/差戻し)"
-        string user "操作者"
-        string comment "コメント"
-        string timestamp "処理日時"
-    }
