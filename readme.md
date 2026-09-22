@@ -59,22 +59,3 @@ graph TD
     GAS -->|データ読み出し・追記| Sheet[(Google スプレッドシート<br>データベース)]
     GAS -->|承認・差戻し通知| Gmail[Gmail API<br>自動メール配信]
 
-
-```mermaid
-erDiagram
-    APPLICATIONS_SHEET ||--o{ TIMELINE_SHEET : "refNumで紐付け (1対多)"
-
-    APPLICATIONS_SHEET {
-        string refNum PK "申請番号"
-        string applicantNM "申請者"
-        string status "ステータス (申請中/承認/差戻し)"
-        string createdAt "申請日時"
-    }
-
-    TIMELINE_SHEET {
-        string refNum FK "申請番号"
-        string action "操作 (作成/承認/差戻し)"
-        string user "操作者"
-        string comment "コメント"
-        string timestamp "処理日時"
-    }
