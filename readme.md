@@ -61,7 +61,7 @@ graph TD
 
 
 erDiagram
-    APPLICATIONS_SHEET ||--o{ TIMELINE_SHEET: "refNumで紐付け (1対多)"
+    APPLICATIONS_SHEET ||--o{ TIMELINE_SHEET : "refNumで紐付け (1対多)"
 
     APPLICATIONS_SHEET {
         string refNum PK "申請番号"
