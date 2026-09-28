@@ -5,7 +5,39 @@ Google Apps Script (GAS) と HTML/CSS/JavaScript で構築した、Webベース�
 
 ---
 
+・デモ画像（GIF） - 登録処理
+<img width="946" height="720" alt="GAS-demo" src="https://github.com/user-attachments/assets/b94fd328-570b-41a7-afe5-004cd671692e" />
+
+
 ![アプリデモ画面](docs/GIF-demo.gif)
+<details>
+<summary><b>テーブル定義（クリックで開く）</b></summary>
+
+<sub>
+
+| 物理名 | 論理名 | 型（桁数）| 備考 |
+| :--- | :--- | :--- | :-- |
+| refNum | 起案番号| String | PK |
+| applicationDate | 申請日| date |  |
+| companyName | 起案会社 | String | |
+| deptName | 所属部署| String | |
+| employeeId | 申請者ID| String | |
+| employeeName | 申請者名| String | |
+| deptType | 所属部署種別| String | |
+| sealCompany | 押印が必要な会社| String | |
+| clientCompany | 相手先会社名| String | |
+| documentName | 書類名| String | |
+| copies | 必要な部数| Integer | |
+| sealType | 必要押印| String | |
+| approvalNum | 稟決番号| String | |
+| remarks | 備考| String | |
+| approverEmail | 承認者メールアドレス| String | |
+
+</sub>
+
+</details>
+
+---
 
 ## 📌 開発背景と課題解決
 
@@ -39,6 +71,8 @@ Google Apps Script (GAS) と HTML/CSS/JavaScript で構築した、Webベース�
 
 ## 🛠 システム構成・使用技術
 
+<small>
+ 
 | 区分 | 技術・サービス | 用途・選定理由 |
 | :--- | :--- | :--- |
 | **フロントエンド** | HTML5 / CSS3 / JavaScript | 標準的なWebコンポーネントによるレスポンシブ画面設計 |
@@ -46,9 +80,16 @@ Google Apps Script (GAS) と HTML/CSS/JavaScript で構築した、Webベース�
 | **データベース** | Google スプレッドシート | ミドルウェア(DBMS)構築不要。リアルタイム共有・管理者のメンテ容易性 |
 | **通知モジュール** | Gmail API | 承認者・申請者への即時自動メール配信 |
 
+</small>
 
 ### 選定理由
-GASを採用した最大の特徴は開発・稼働のスピード感です。サーバー契約なしで迅速に（且つ無料）デプロイ可能です。データソースに関しては、大量アクセスによるデータベース書き込みが発生しない社内業務においては、スプレッドシート（無料）をデータソースとすることで管理者のメンテ工数も削減できます。
-勤務先のグループウェアが Google Workspace であったため既存環境（ログインレスでユーザ取得が可）を最大活用する思想でしたが、外部メールアドレスであっても正常に動作する設計としています。
+GASを採用した最大の特徴は開発・稼働のスピード感です。サーバー契約なしで迅速に（且つ無料）デプロイ可能です。データソースに関しては、大量アクセスによるデータベース書き込みが発生しない社内業務においては、スプレッドシート（無料）をデータソースとすることで管理者のメンテ工数も削減できます。<br>
+※ 勤務先のグループウェアが Google Workspace であったため既存環境（ログインレスでユーザ取得が可）を最大活用する思想でしたが、外部メールアドレスであっても正常に動作する設計としています。
 
 ---
+
+```mermaid
+graph TD
+    Client[Webブラウザ<br>HTML / CSS / JS] -->|リクエスト / URLパラメータ| GAS[Google Apps Script<br>（バックエンド処理）]
+    GAS -->|データ読み出し・追記| Sheet[("Google スプレッドシート<br>（データベース）")]
+    GAS -->|承認・差戻し通知| Gmail["自動メール配信（Gmail API／.sendEmail()）"]
